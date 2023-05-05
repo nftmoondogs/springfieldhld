@@ -1,9 +1,9 @@
 
 
 
-const subTitle = "About Our Edukon";
-const title = "Good Qualification Services And Better Skills";
-const desc = "Distinctively provide acces mutfuncto users whereas transparent proceses somes ncentivize eficient functionalities rather than extensible archtectur communicate leveraged services and cross-platform.";
+const subTitle = "";
+const title = "Principal's Message";
+const desc = "Welcome to Spring Field Junior High School, an institution committed to academic excellence and student empowerment. Our dedicated faculty and staff strive to provide a comprehensive education tailored to individual needs, fostering both intellectual growth and personal development. We pride ourselves on nurturing a diverse and vibrant learning community, equipped with state-of-the-art facilities and a dynamic curriculum. I encourage you to explore our website and learn about the enriching opportunities Spring Field Junior High School offers. Sincerely, Nighat Parveen Principal, Spring Field Junior High School.";
 
 
 
@@ -38,23 +38,15 @@ const About = () => {
                         <div className="about-right padding-tb">
                             <div className="section-header">
                                 <span className="subtitle">{subTitle}</span>
-                                <h2 className="title">{title}</h2>
-                                <p>{desc}</p>
+                                <h1>Principal's Message</h1>
+    <p>Welcome to Spring Field Junior High School, an institution committed to academic excellence and student empowerment. Our dedicated faculty and staff strive to provide a comprehensive education tailored to individual needs, fostering both intellectual growth and personal development.</p>
+    <p>We pride ourselves on nurturing a diverse and vibrant learning community, equipped with great facilities and a dynamic curriculum. I encourage you to explore our website and learn about the enriching opportunities Spring Field Junior High School offers.</p>
+    <p>Sincerely,</p>
+    <p><br></br><strong>Principal, Spring Field Junior High School</strong></p>
+                                
                             </div>
                             <div className="section-wrapper">
-                                <ul className="lab-ul">
-                                    {aboutList.map((val, i) => (
-                                        <li key={i}>
-                                            <div className="sr-left">
-                                                <img src={`${val.imgUrl}`} alt={`${val.imgAlt}`} />
-                                            </div>
-                                            <div className="sr-right">
-                                                <h5>{val.title}</h5>
-                                                <p>{val.desc}</p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
+                        
                             </div>
                         </div>
                     </div>

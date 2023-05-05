@@ -16,26 +16,26 @@ const contactList = [
     {
         imgUrl: 'assets/images/icon/01.png',
         imgAlt: 'contact icon',
-        title: 'Office Address',
-        desc: '1201 park street, Fifth Avenue',
+        title: 'Address',
+        desc: 'Behind Ara Machine, Kidwai Nagar, Haldwani (Nainital) Uttrakhand',
     },
     {
         imgUrl: 'assets/images/icon/02.png',
         imgAlt: 'contact icon',
         title: 'Phone number',
-        desc: '+22698 745 632,02 982 745',
+        desc: '+918881177767',
     },
     {
         imgUrl: 'assets/images/icon/03.png',
         imgAlt: 'contact icon',
         title: 'Send email',
-        desc: 'adminedukon@gmil.com',
+        desc: 'springfieldhld@gmail.com',
     },
     {
         imgUrl: 'assets/images/icon/04.png',
         imgAlt: 'contact icon',
         title: 'Our website',
-        desc: 'www.edukon.com',
+        desc: 'www.springfieldhld.com',
     },
 ]
 
@@ -48,8 +48,7 @@ const ContactPage = () => {
             <div className="map-address-section padding-tb section-bg">
                 <div className="container">
                     <div className="section-header text-center">
-                        <span className="subtitle">{subTitle}</span>
-                        <h2 className="title">{title}</h2>
+                   
                     </div>
                     <div className="section-wrapper">
                         <div className="row flex-row-reverse">
@@ -69,63 +68,16 @@ const ContactPage = () => {
                                 </div>
                             </div>
                             <div className="col-xl-8 col-lg-7 col-12">
-                                <GoogleMap />
+                            <div className="banner-thumb">
+                                <img src="assets/images/choose/01.png" alt="img" />
+                            </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="contact-section padding-tb">
-                <div className="container">
-                    <div className="section-header text-center">
-                        <span className="subtitle">{conSubTitle}</span>
-                        <h2 className="title">{conTitle}</h2>
-                    </div>
-                    <div className="section-wrapper">
-                        <form className="contact-form">
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    name="name"
-                                    placeholder="Your Name *"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    name="email"
-                                    placeholder="Your Email *"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    name="number"
-                                    placeholder="Mobile Number *"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    name="subject"
-                                    placeholder="Your Subject *"
-                                />
-                            </div>
-                            <div className="form-group w-100">
-                                <textarea 
-                                    rows="8" 
-                                    type="text"
-                                    placeholder="Your Message"
-                                ></textarea>
-                            </div>
-                            <div className="form-group w-100 text-center">
-                                <button className="lab-btn"><span>{btnText}</span></button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <Footer />
+            
+           
         </Fragment>
     );
 }

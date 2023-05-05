@@ -17,14 +17,10 @@ const Home = () => {
         <Fragment>
             <Header />
             <Banner />
-            <Sponsor />
-            <Category />
-            <Course />
             <About />
-            <Instructor />
-            <Student />
-            <Blog />
+            <Category />
             <Achievement />
+            <Instructor />
             <Footer />
         </Fragment>
     );

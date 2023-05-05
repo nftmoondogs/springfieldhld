@@ -1,45 +1,30 @@
 
 import CountUp from 'react-countup';
 
-const subTitle = "START TO SUCCESS";
-const title = "Achieve Your Goals With Edukon";
+const subTitle = "";
+const title = "";
 
 
 const achievementList = [
-    {
-        count: '30',
-        desc: 'Years of Language Education Experience',
-    },
-    {
-        count: '3084',
-        desc: 'Learners Enrolled in Edukon Courses',
-    },
-    {
-        count: '330',
-        desc: 'Qualified Teachers And Language Experts',
-    },
-    {
-        count: '2300',
-        desc: 'Innovative Foreign Language Courses',
-    },
+
 ]
 
 const achieveList = [
     {
         imgUrl: 'assets/images/achive/01.png',
         imgAlt: 'achive thumb rajibraj91 rajibraj',
-        title: 'Start Teaching Today',
-        desc: 'Seamlessly engage technically sound coaborative reintermed goal oriented content rather than ethica',
-        btnText: 'Become A Instructor',
-        siteLink: '#',
+        title: 'Transparent Fee Structure',
+        desc: 'Explore our affordable and transparent fee structure, designed to ensure quality education is accessible to all.',
+        btnText: 'View Fees',
+        siteLink: '/blog',
     },
     {
         imgUrl: 'assets/images/achive/02.png',
         imgAlt: 'achive thumb rajibraj91 rajibraj',
-        title: 'If You Join Our Course',
-        desc: 'Seamlessly engage technically sound coaborative reintermed goal oriented content rather than ethica',
-        btnText: 'Register For Free',
-        siteLink: '#',
+        title: 'Curated Book Lists',
+        desc: 'Discover the carefully selected list of books for each class, crafted to provide a comprehensive learning experience.',
+        btnText: 'Browse Books',
+        siteLink: '/about',
     },
 ]
 

@@ -69,6 +69,14 @@
     }
 }
 
+/* Add this to your CSS file or in a <style> tag in your component */
+
+.centered-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 // sidebar
 .course-side-detail {
     @extend %mb-30;

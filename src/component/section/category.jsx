@@ -1,84 +1,61 @@
 
-import { Link } from "react-router-dom";
-
-const subTitle = "Popular Category";
-const title = "Popular Category For Learn";
-const btnText = "Browse All Categories";
 
 
-const categoryList = [
-    {
-        imgUrl: 'assets/images/category/icon/01.jpg',
-        imgAlt: 'category rajibraj91 rajibraj',
-        title: 'Computer Science',
-        count: '24 Course',
-    },
-    {
-        imgUrl: 'assets/images/category/icon/02.jpg',
-        imgAlt: 'category rajibraj91 rajibraj',
-        title: 'Civil Engineering',
-        count: '04 Course',
-    },
-    {
-        imgUrl: 'assets/images/category/icon/03.jpg',
-        imgAlt: 'category rajibraj91 rajibraj',
-        title: 'Business Analysis',
-        count: '27 Course',
-    },
-    {
-        imgUrl: 'assets/images/category/icon/04.jpg',
-        imgAlt: 'category rajibraj91 rajibraj',
-        title: 'Data Science Analytics',
-        count: '28 Course',
-    },
-    {
-        imgUrl: 'assets/images/category/icon/05.jpg',
-        imgAlt: 'category rajibraj91 rajibraj',
-        title: 'Learning Management',
-        count: '78 Course',
-    },
-    {
-        imgUrl: 'assets/images/category/icon/06.jpg',
-        imgAlt: 'category rajibraj91 rajibraj',
-        title: 'Computer Engineering',
-        count: '38 Course',
-    },
+const subTitle = "";
+const title = <h2 className="title"><span className="d-lg-block">Spring Field</span> Junior High School</h2>;
+const desc = "";
+
+
+const catagoryList = [
+
 ]
 
 
-const Category = () => {
+const shapeList = [
+
+]
+
+const Banner = () => {
     return (
-        <div className="category-section padding-tb">
+        <section className="banner-section">
             <div className="container">
-                <div className="section-header text-center">
-                    <span className="subtitle">{subTitle}</span>
-                    <h2 className="title">{title}</h2>
-                </div>
                 <div className="section-wrapper">
-                    <div className="row g-2 justify-content-center row-cols-xl-6 row-cols-md-3 row-cols-sm-2 row-cols-1">
-                        {categoryList.map((val, i) => (
-                            <div className="col" key={i}>
-                                <div className="category-item text-center">
-                                    <div className="category-inner">
-                                        <div className="category-thumb">
-                                            <img src={`${val.imgUrl}`} alt={val.imgAlt} />
-                                        </div>
-                                        <div className="category-content">
-                                            <Link to="/course"><h6>{val.title}</h6></Link>
-                                            <span>{val.count}</span>
-                                        </div>
-                                    </div>
+                    <div className="row align-items-center">
+                        <div className="col-xxl-6 col-xl-6 col-lg-10">
+                            <div className="banner-content">
+                            
+                                <h1>Our Vision</h1>
+    <p>At Spring Field Junior High School, we strive to cultivate a community of lifelong learners, prepared to excel in a constantly evolving global landscape. Our vision encompasses fostering intellectual curiosity, critical thinking, empathy, and resilience in our students.</p>
+    <p>Through our dedicated faculty and staff, we deliver a comprehensive education tailored to individual strengths and interests. By embracing diversity and inclusivity, we aim to prepare our students to thrive in a multicultural world, empowering them to shape a brighter future for themselves and society.</p>
+                              
+                                <div className="banner-catagory d-flex flex-wrap">
+                                    <p></p>
+                                    <ul className="lab-ul d-flex flex-wrap">
+                                        {catagoryList.map((val, i) => (
+                                            <li key={i}><a href={val.link}>{val.name}</a></li>
+                                        ))}
+                                    </ul>
                                 </div>
-                            </div>  
-                        ))}
-                    </div>
-                    <div className="text-center mt-5">
-                        <Link to="/course" className="lab-btn"><span>{btnText}</span></Link>
+                            </div>
+                        </div>
+                        <div className="col-xxl- col-xl-6">
+                            <div className="banner-thumb">
+                                <img src="assets/images/banner/01.png" alt="img" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+           
+            <div className="cbs-content-list d-none">
+                <ul className="lab-ul">
+                    {shapeList.map((val, i) => (
+                        <li className={val.className} key={i}><a href={val.link}>{val.name}</a></li>
+                    ))}
+                </ul>
+            </div>
+        </section>
     );
 }
  
-export default Category;
+export default Banner;
