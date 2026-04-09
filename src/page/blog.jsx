@@ -156,7 +156,7 @@ const BlogPage = () => {
 
                   {feeData.notes && (
                     <div className="tw-mt-6 tw-bg-amber-50 tw-border tw-border-amber-200 tw-rounded-xl tw-p-4 sm:tw-p-6">
-                      <h4 className="tw-font-bold tw-text-amber-800 tw-text-sm tw-mb-2">📋 Notes</h4>
+                      <h4 className="tw-font-bold tw-text-amber-800 tw-text-sm tw-mb-2">Notes</h4>
                       <p className="tw-text-amber-700 tw-text-sm tw-whitespace-pre-line">{feeData.notes}</p>
                     </div>
                   )}

@@ -7,6 +7,7 @@ const BookList = () => {
   const [bookData, setBookData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
+  const [expandedClass, setExpandedClass] = useState(null);
 
   useEffect(() => {
     const fetchYears = async () => {
@@ -28,6 +29,7 @@ const BookList = () => {
       setLoading(true);
       const data = await getBookData(selectedYear);
       setBookData(data);
+      setExpandedClass(null);
       setLoading(false);
     };
     fetchData();
@@ -35,10 +37,10 @@ const BookList = () => {
 
   if (loading && years.length === 0) {
     return (
-      <div className="tw-min-h-[60vh] tw-flex tw-items-center tw-justify-center tw-bg-gradient-to-br tw-from-slate-50 tw-to-slate-100">
-        <div className="tw-text-center">
-          <div className="tw-w-12 tw-h-12 tw-border-4 tw-border-slate-200 tw-border-t-amber-500 tw-rounded-full tw-animate-spin tw-mx-auto tw-mb-4"></div>
-          <p className="tw-text-slate-500 tw-font-medium tw-text-lg">Loading book list...</p>
+      <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 48, height: 48, border: "4px solid #e2e8f0", borderTopColor: "#f59e0b", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+          <p style={{ color: "#64748b", fontWeight: 500, fontSize: "16px" }}>Loading book lists...</p>
         </div>
       </div>
     );
@@ -46,193 +48,372 @@ const BookList = () => {
 
   if (years.length === 0) {
     return (
-      <div className="tw-min-h-[40vh] tw-flex tw-items-center tw-justify-center tw-bg-gradient-to-br tw-from-slate-50 tw-to-slate-100">
-        <p className="tw-text-slate-400 tw-text-lg tw-font-medium">No book lists available yet.</p>
+      <div style={{ minHeight: "40vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 64, height: 64, background: "#f1f5f9", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+            <i className="icofont-book-alt" style={{ fontSize: "28px", color: "#94a3b8" }}></i>
+          </div>
+          <p style={{ color: "#94a3b8", fontSize: "16px", fontWeight: 500 }}>No book lists available yet.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="tw-bg-gradient-to-br tw-from-slate-50 tw-to-slate-100 tw-py-8 sm:tw-py-12 tw-px-3 sm:tw-px-6 lg:tw-px-8">
-      <div className="tw-max-w-7xl tw-mx-auto">
-        {/* Header */}
-        <div className="tw-text-center tw-mb-6 sm:tw-mb-8">
-          <h2 className="tw-text-2xl sm:tw-text-3xl md:tw-text-4xl tw-font-extrabold tw-text-slate-800 tw-tracking-tight">
-            {bookData?.schoolName || "SPRING FIELD SCHOOL"}
-          </h2>
-
-          {/* Year Tabs */}
-          <div className="tw-mt-4 sm:tw-mt-5 tw-flex tw-flex-wrap tw-items-center tw-justify-center tw-gap-2">
+    <div style={{ background: "#f8fafc", padding: "40px 0 60px" }}>
+      <div className="container">
+        {/* Year Selector */}
+        <div data-aos="fade-up" style={{ textAlign: "center", marginBottom: "40px" }}>
+          <p style={{ fontSize: "13px", fontWeight: 600, color: "#64748b", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>
+            Select Academic Year
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "8px" }}>
             {years.map((year) => (
               <button
                 key={year}
                 onClick={() => setSelectedYear(year)}
-                className={`tw-px-4 sm:tw-px-5 tw-py-2 tw-rounded-full tw-font-bold tw-text-xs sm:tw-text-sm tw-transition-all tw-duration-200 tw-border-2 ${
-                  selectedYear === year
-                    ? "tw-bg-amber-500 tw-text-white tw-border-amber-500 tw-shadow-lg tw-shadow-amber-500/25"
-                    : "tw-bg-white tw-text-slate-600 tw-border-slate-200 hover:tw-border-amber-400 hover:tw-text-amber-600"
-                }`}
+                style={{
+                  padding: "10px 24px",
+                  borderRadius: "12px",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  border: "2px solid",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  ...(selectedYear === year
+                    ? {
+                        background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                        color: "#fff",
+                        borderColor: "#f59e0b",
+                        boxShadow: "0 8px 20px rgba(245,158,11,0.3)",
+                      }
+                    : {
+                        background: "#fff",
+                        color: "#475569",
+                        borderColor: "#e2e8f0",
+                      }),
+                }}
               >
-                📚 {year}
+                <i className="icofont-calendar" style={{ marginRight: "6px" }}></i>
+                {year}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Loading for year switch */}
+        {/* Loading */}
         {loading ? (
-          <div className="tw-flex tw-items-center tw-justify-center tw-py-20">
-            <div className="tw-w-10 tw-h-10 tw-border-4 tw-border-slate-200 tw-border-t-amber-500 tw-rounded-full tw-animate-spin"></div>
+          <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
+            <div style={{ width: 40, height: 40, border: "4px solid #e2e8f0", borderTopColor: "#f59e0b", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
           </div>
         ) : !bookData ? (
-          <div className="tw-text-center tw-py-20">
-            <p className="tw-text-slate-400 tw-text-lg">No data found for {selectedYear}</p>
+          <div style={{ textAlign: "center", padding: "80px 0" }}>
+            <p style={{ color: "#94a3b8", fontSize: "16px" }}>No data found for {selectedYear}</p>
           </div>
         ) : (
           /* Classes Grid */
-          <div className="tw-grid tw-grid-cols-1 lg:tw-grid-cols-2 tw-gap-5 sm:tw-gap-8">
-            {bookData.classes.map((cls) => (
-              <div
-                key={cls.id}
-                className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-lg tw-shadow-slate-200/50 tw-border tw-border-slate-200/60 tw-overflow-hidden hover:tw-shadow-xl tw-transition-shadow tw-duration-300"
-              >
-                {/* Class Header */}
-                <div className="tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-px-4 sm:tw-px-6 tw-py-4 sm:tw-py-5 tw-text-center">
-                  <p className="tw-text-slate-400 tw-text-[10px] sm:tw-text-xs tw-font-semibold tw-tracking-widest tw-uppercase tw-mb-0.5">
-                    {bookData.schoolName}
-                  </p>
-                  <p className="tw-text-slate-400 tw-text-[10px] sm:tw-text-xs tw-font-medium tw-mb-1">
-                    BOOK LIST {selectedYear}
-                  </p>
-                  <h3 className="tw-text-amber-400 tw-text-xl sm:tw-text-2xl tw-font-extrabold tw-tracking-widest">
-                    {cls.name}
-                  </h3>
-                </div>
+          <div className="row g-4">
+            {bookData.classes.map((cls, classIdx) => {
+              const total = getClassTotal(cls.books);
+              const isExpanded = expandedClass === cls.id;
 
-                {/* Mobile Card View */}
-                <div className="sm:tw-hidden">
-                  {cls.books.map((book, idx) => (
+              return (
+                <div className="col-lg-6" key={cls.id}>
+                  <div
+                    data-aos="fade-up"
+                    data-aos-delay={classIdx * 80}
+                    style={{
+                      background: "#fff",
+                      borderRadius: "20px",
+                      overflow: "hidden",
+                      border: "1px solid #e2e8f0",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.04)"; }}
+                  >
+                    {/* Class Header */}
                     <div
-                      key={book.id}
-                      className="tw-px-4 tw-py-3 tw-border-b tw-border-slate-100 last:tw-border-b-0"
+                      style={{
+                        background: "linear-gradient(135deg, #0f172a, #1e293b)",
+                        padding: "20px 24px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => setExpandedClass(isExpanded ? null : cls.id)}
                     >
-                      <div className="tw-flex tw-items-start tw-gap-3">
-                        {/* Index */}
-                        <span className="tw-text-xs tw-font-bold tw-text-slate-400 tw-mt-1 tw-min-w-[16px]">{idx + 1}</span>
-
-                        {/* Images */}
-                        <div className="tw-flex tw-gap-2 tw-shrink-0">
-                          {book.frontImage ? (
-                            <img
-                              src={book.frontImage}
-                              alt={`${book.name} front`}
-                              className="tw-w-12 tw-h-16 tw-object-cover tw-rounded-md tw-border tw-border-slate-200 tw-cursor-pointer"
-                              onClick={() => setPreviewImage(book.frontImage)}
-                            />
-                          ) : (
-                            <div className="tw-w-12 tw-h-16 tw-bg-slate-100 tw-rounded-md tw-border tw-border-dashed tw-border-slate-300 tw-flex tw-items-center tw-justify-center">
-                              <svg className="tw-w-4 tw-h-4 tw-text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                            </div>
-                          )}
-                          {book.backImage ? (
-                            <img
-                              src={book.backImage}
-                              alt={`${book.name} back`}
-                              className="tw-w-12 tw-h-16 tw-object-cover tw-rounded-md tw-border tw-border-slate-200 tw-cursor-pointer"
-                              onClick={() => setPreviewImage(book.backImage)}
-                            />
-                          ) : (
-                            <div className="tw-w-12 tw-h-16 tw-bg-slate-100 tw-rounded-md tw-border tw-border-dashed tw-border-slate-300 tw-flex tw-items-center tw-justify-center">
-                              <svg className="tw-w-4 tw-h-4 tw-text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                            </div>
-                          )}
+                      <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                        <div
+                          style={{
+                            width: "44px",
+                            height: "44px",
+                            background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                            borderRadius: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <i className="icofont-book-alt" style={{ fontSize: "18px", color: "#fff" }}></i>
                         </div>
-
-                        {/* Name + Price */}
-                        <div className="tw-flex-1 tw-min-w-0">
-                          <p className="tw-font-semibold tw-text-slate-700 tw-uppercase tw-text-xs tw-tracking-wide tw-leading-tight">
-                            {book.name}
+                        <div>
+                          <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#fff", margin: 0, letterSpacing: "0.5px" }}>
+                            {cls.name}
+                          </h3>
+                          <p style={{ fontSize: "11px", color: "#94a3b8", margin: 0, marginTop: "2px" }}>
+                            {cls.books.length} {cls.books.length === 1 ? "book" : "books"} &middot; {selectedYear}
                           </p>
-                          <p className="tw-font-bold tw-text-slate-800 tw-text-sm tw-mt-1">₹{book.price}</p>
                         </div>
                       </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <div style={{ textAlign: "right" }}>
+                          <p style={{ fontSize: "10px", color: "#94a3b8", margin: 0, textTransform: "uppercase", letterSpacing: "1px" }}>Total</p>
+                          <p style={{ fontSize: "18px", fontWeight: 800, color: "#fbbf24", margin: 0 }}>
+                            ₹{total.toFixed(0)}
+                          </p>
+                        </div>
+                        <i
+                          className={isExpanded ? "icofont-rounded-up" : "icofont-rounded-down"}
+                          style={{ fontSize: "20px", color: "#64748b", transition: "transform 0.3s" }}
+                        ></i>
+                      </div>
                     </div>
-                  ))}
-                </div>
 
-                {/* Desktop Table View */}
-                <div className="tw-hidden sm:tw-block tw-overflow-x-auto">
-                  <table className="tw-w-full tw-text-sm">
-                    <thead>
-                      <tr className="tw-bg-slate-50 tw-border-b-2 tw-border-slate-200">
-                        <th className="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider tw-w-12">#</th>
-                        <th className="tw-px-3 tw-py-3 tw-text-center tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider tw-w-24">Front</th>
-                        <th className="tw-px-3 tw-py-3 tw-text-center tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider tw-w-24">Back</th>
-                        <th className="tw-px-4 tw-py-3 tw-text-left tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider">Book Name</th>
-                        <th className="tw-px-4 tw-py-3 tw-text-right tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider tw-w-24">Price (₹)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="tw-divide-y tw-divide-slate-100">
-                      {cls.books.map((book, idx) => (
-                        <tr key={book.id} className="hover:tw-bg-amber-50/40 tw-transition-colors tw-duration-150">
-                          <td className="tw-px-4 tw-py-3 tw-text-center tw-font-bold tw-text-slate-400 tw-text-sm">{idx + 1}</td>
-                          <td className="tw-px-3 tw-py-3 tw-text-center">
-                            {book.frontImage ? (
-                              <img
-                                src={book.frontImage}
-                                alt={`${book.name} front`}
-                                className="tw-w-16 tw-h-20 tw-object-cover tw-rounded-lg tw-border-2 tw-border-slate-200 tw-cursor-pointer hover:tw-scale-110 hover:tw-shadow-lg tw-transition-all tw-duration-200 tw-mx-auto"
-                                onClick={() => setPreviewImage(book.frontImage)}
-                              />
-                            ) : (
-                              <div className="tw-w-16 tw-h-20 tw-bg-slate-100 tw-rounded-lg tw-border-2 tw-border-dashed tw-border-slate-300 tw-flex tw-items-center tw-justify-center tw-mx-auto">
-                                <svg className="tw-w-5 tw-h-5 tw-text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                              </div>
-                            )}
-                          </td>
-                          <td className="tw-px-3 tw-py-3 tw-text-center">
-                            {book.backImage ? (
-                              <img
-                                src={book.backImage}
-                                alt={`${book.name} back`}
-                                className="tw-w-16 tw-h-20 tw-object-cover tw-rounded-lg tw-border-2 tw-border-slate-200 tw-cursor-pointer hover:tw-scale-110 hover:tw-shadow-lg tw-transition-all tw-duration-200 tw-mx-auto"
-                                onClick={() => setPreviewImage(book.backImage)}
-                              />
-                            ) : (
-                              <div className="tw-w-16 tw-h-20 tw-bg-slate-100 tw-rounded-lg tw-border-2 tw-border-dashed tw-border-slate-300 tw-flex tw-items-center tw-justify-center tw-mx-auto">
-                                <svg className="tw-w-5 tw-h-5 tw-text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                              </div>
-                            )}
-                          </td>
-                          <td className="tw-px-4 tw-py-3 tw-font-semibold tw-text-slate-700 tw-uppercase tw-tracking-wide tw-text-sm">{book.name}</td>
-                          <td className="tw-px-4 tw-py-3 tw-text-right tw-font-bold tw-text-slate-800 tw-text-base">{book.price}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr className="tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900">
-                        <td colSpan="4" className="tw-px-6 tw-py-4 tw-text-center tw-font-extrabold tw-text-white tw-text-base tw-uppercase tw-tracking-[3px]">TOTAL</td>
-                        <td className="tw-px-4 tw-py-4 tw-text-right tw-font-extrabold tw-text-amber-400 tw-text-lg">₹{getClassTotal(cls.books).toFixed(2)}</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
+                    {/* Book List - always visible on desktop, collapsible concept but shown */}
+                    <div style={{ maxHeight: isExpanded ? "2000px" : "0", overflow: "hidden", transition: "max-height 0.5s ease" }}>
+                      {/* Mobile Card View */}
+                      <div className="d-sm-none">
+                        {cls.books.map((book, idx) => (
+                          <div
+                            key={book.id}
+                            style={{
+                              padding: "14px 16px",
+                              borderBottom: idx < cls.books.length - 1 ? "1px solid #f1f5f9" : "none",
+                              display: "flex",
+                              alignItems: "flex-start",
+                              gap: "12px",
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: "24px",
+                                height: "24px",
+                                background: "#f1f5f9",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontSize: "11px",
+                                fontWeight: 700,
+                                color: "#94a3b8",
+                                flexShrink: 0,
+                                marginTop: "2px",
+                              }}
+                            >
+                              {idx + 1}
+                            </span>
 
-                {/* Mobile Total */}
-                <div className="sm:tw-hidden tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-px-4 tw-py-3 tw-flex tw-items-center tw-justify-between">
-                  <span className="tw-font-extrabold tw-text-white tw-text-sm tw-uppercase tw-tracking-[3px]">TOTAL</span>
-                  <span className="tw-font-extrabold tw-text-amber-400 tw-text-lg">₹{getClassTotal(cls.books).toFixed(2)}</span>
+                            <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+                              {book.frontImage ? (
+                                <img
+                                  src={book.frontImage}
+                                  alt={`${book.name} front`}
+                                  style={{
+                                    width: "44px",
+                                    height: "58px",
+                                    objectFit: "cover",
+                                    borderRadius: "8px",
+                                    border: "1px solid #e2e8f0",
+                                    cursor: "pointer",
+                                  }}
+                                  onClick={() => setPreviewImage(book.frontImage)}
+                                />
+                              ) : (
+                                <div style={{ width: 44, height: 58, background: "#f1f5f9", borderRadius: 8, border: "1px dashed #cbd5e1", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  <i className="icofont-image" style={{ fontSize: "14px", color: "#cbd5e1" }}></i>
+                                </div>
+                              )}
+                              {book.backImage ? (
+                                <img
+                                  src={book.backImage}
+                                  alt={`${book.name} back`}
+                                  style={{
+                                    width: "44px",
+                                    height: "58px",
+                                    objectFit: "cover",
+                                    borderRadius: "8px",
+                                    border: "1px solid #e2e8f0",
+                                    cursor: "pointer",
+                                  }}
+                                  onClick={() => setPreviewImage(book.backImage)}
+                                />
+                              ) : (
+                                <div style={{ width: 44, height: 58, background: "#f1f5f9", borderRadius: 8, border: "1px dashed #cbd5e1", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  <i className="icofont-image" style={{ fontSize: "14px", color: "#cbd5e1" }}></i>
+                                </div>
+                              )}
+                            </div>
+
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: "12px", fontWeight: 600, color: "#334155", textTransform: "uppercase", letterSpacing: "0.3px", lineHeight: 1.4, margin: 0 }}>
+                                {book.name}
+                              </p>
+                              <p style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a", marginTop: "4px", margin: 0 }}>
+                                ₹{book.price}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Desktop Table View */}
+                      <div className="d-none d-sm-block" style={{ overflowX: "auto" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                          <thead>
+                            <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
+                              <th style={{ padding: "12px 16px", fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "1px", textAlign: "center", width: "48px" }}>#</th>
+                              <th style={{ padding: "12px 12px", fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "1px", textAlign: "center", width: "80px" }}>Front</th>
+                              <th style={{ padding: "12px 12px", fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "1px", textAlign: "center", width: "80px" }}>Back</th>
+                              <th style={{ padding: "12px 16px", fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "1px", textAlign: "left" }}>Book Name</th>
+                              <th style={{ padding: "12px 16px", fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "1px", textAlign: "right", width: "90px" }}>Price</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {cls.books.map((book, idx) => (
+                              <tr
+                                key={book.id}
+                                style={{
+                                  borderBottom: "1px solid #f1f5f9",
+                                  transition: "background 0.2s",
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "#fffbeb"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                              >
+                                <td style={{ padding: "12px 16px", textAlign: "center" }}>
+                                  <span style={{ width: 26, height: 26, background: "#f1f5f9", borderRadius: 8, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, color: "#94a3b8" }}>
+                                    {idx + 1}
+                                  </span>
+                                </td>
+                                <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                                  {book.frontImage ? (
+                                    <img
+                                      src={book.frontImage}
+                                      alt={`${book.name} front`}
+                                      style={{
+                                        width: 52,
+                                        height: 66,
+                                        objectFit: "cover",
+                                        borderRadius: "10px",
+                                        border: "2px solid #e2e8f0",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s",
+                                      }}
+                                      onClick={() => setPreviewImage(book.frontImage)}
+                                      onMouseEnter={(e) => { e.target.style.transform = "scale(1.08)"; e.target.style.boxShadow = "0 8px 20px rgba(0,0,0,0.12)"; }}
+                                      onMouseLeave={(e) => { e.target.style.transform = "scale(1)"; e.target.style.boxShadow = "none"; }}
+                                    />
+                                  ) : (
+                                    <div style={{ width: 52, height: 66, background: "#f8fafc", borderRadius: 10, border: "2px dashed #e2e8f0", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                                      <i className="icofont-image" style={{ fontSize: "16px", color: "#d1d5db" }}></i>
+                                    </div>
+                                  )}
+                                </td>
+                                <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                                  {book.backImage ? (
+                                    <img
+                                      src={book.backImage}
+                                      alt={`${book.name} back`}
+                                      style={{
+                                        width: 52,
+                                        height: 66,
+                                        objectFit: "cover",
+                                        borderRadius: "10px",
+                                        border: "2px solid #e2e8f0",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s",
+                                      }}
+                                      onClick={() => setPreviewImage(book.backImage)}
+                                      onMouseEnter={(e) => { e.target.style.transform = "scale(1.08)"; e.target.style.boxShadow = "0 8px 20px rgba(0,0,0,0.12)"; }}
+                                      onMouseLeave={(e) => { e.target.style.transform = "scale(1)"; e.target.style.boxShadow = "none"; }}
+                                    />
+                                  ) : (
+                                    <div style={{ width: 52, height: 66, background: "#f8fafc", borderRadius: 10, border: "2px dashed #e2e8f0", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                                      <i className="icofont-image" style={{ fontSize: "16px", color: "#d1d5db" }}></i>
+                                    </div>
+                                  )}
+                                </td>
+                                <td style={{ padding: "12px 16px" }}>
+                                  <span style={{ fontSize: "13px", fontWeight: 600, color: "#334155", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                                    {book.name}
+                                  </span>
+                                </td>
+                                <td style={{ padding: "12px 16px", textAlign: "right" }}>
+                                  <span style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a" }}>
+                                    ₹{book.price}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                          <tfoot>
+                            <tr style={{ background: "linear-gradient(135deg, #0f172a, #1e293b)" }}>
+                              <td colSpan="4" style={{ padding: "14px 20px", fontSize: "13px", fontWeight: 800, color: "#fff", textTransform: "uppercase", letterSpacing: "2px", textAlign: "right" }}>
+                                Total
+                              </td>
+                              <td style={{ padding: "14px 16px", textAlign: "right", fontSize: "17px", fontWeight: 800, color: "#fbbf24" }}>
+                                ₹{total.toFixed(0)}
+                              </td>
+                            </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+
+                      {/* Mobile Total */}
+                      <div
+                        className="d-sm-none"
+                        style={{
+                          background: "linear-gradient(135deg, #0f172a, #1e293b)",
+                          padding: "14px 16px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <span style={{ fontSize: "12px", fontWeight: 800, color: "#fff", textTransform: "uppercase", letterSpacing: "2px" }}>Total</span>
+                        <span style={{ fontSize: "17px", fontWeight: 800, color: "#fbbf24" }}>₹{total.toFixed(0)}</span>
+                      </div>
+                    </div>
+
+                    {/* Collapsed state - click to expand prompt */}
+                    {!isExpanded && (
+                      <div
+                        style={{
+                          padding: "14px 24px",
+                          textAlign: "center",
+                          cursor: "pointer",
+                          background: "#f8fafc",
+                          borderTop: "1px solid #e2e8f0",
+                          transition: "background 0.2s",
+                        }}
+                        onClick={() => setExpandedClass(cls.id)}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "#f1f5f9"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "#f8fafc"; }}
+                      >
+                        <span style={{ fontSize: "13px", fontWeight: 600, color: "#f59e0b" }}>
+                          <i className="icofont-eye" style={{ marginRight: "6px" }}></i>
+                          View {cls.books.length} {cls.books.length === 1 ? "book" : "books"}
+                          <span style={{ color: "#94a3b8", fontWeight: 500 }}> &middot; Total ₹{total.toFixed(0)}</span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -240,20 +421,68 @@ const BookList = () => {
       {/* Image Preview Modal */}
       {previewImage && (
         <div
-          className="tw-fixed tw-inset-0 tw-bg-black/85 tw-z-[10000] tw-flex tw-items-center tw-justify-center tw-cursor-pointer tw-p-4"
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.88)",
+            zIndex: 10000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            padding: "16px",
+            backdropFilter: "blur(8px)",
+          }}
           onClick={() => setPreviewImage(null)}
         >
-          <div className="tw-relative tw-max-w-[95vw] sm:tw-max-w-[90vw] tw-max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+          <div style={{ position: "relative", maxWidth: "95vw", maxHeight: "90vh" }} onClick={(e) => e.stopPropagation()}>
             <button
-              className="tw-absolute tw--top-3 tw--right-3 tw-w-10 tw-h-10 tw-rounded-full tw-bg-white tw-text-slate-800 tw-text-xl tw-font-bold tw-flex tw-items-center tw-justify-center tw-shadow-xl tw-cursor-pointer tw-z-[10001] hover:tw-bg-red-500 hover:tw-text-white tw-transition-colors"
+              style={{
+                position: "absolute",
+                top: "-14px",
+                right: "-14px",
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                background: "#fff",
+                border: "none",
+                color: "#334155",
+                fontSize: "18px",
+                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+                zIndex: 10001,
+                transition: "all 0.2s",
+              }}
               onClick={() => setPreviewImage(null)}
+              onMouseEnter={(e) => { e.target.style.background = "#ef4444"; e.target.style.color = "#fff"; }}
+              onMouseLeave={(e) => { e.target.style.background = "#fff"; e.target.style.color = "#334155"; }}
             >
-              ✕
+              <i className="icofont-close-line"></i>
             </button>
-            <img src={previewImage} alt="Book preview" className="tw-max-w-[95vw] sm:tw-max-w-[90vw] tw-max-h-[85vh] tw-object-contain tw-rounded-xl tw-shadow-2xl" />
+            <img
+              src={previewImage}
+              alt="Book preview"
+              style={{
+                maxWidth: "95vw",
+                maxHeight: "85vh",
+                objectFit: "contain",
+                borderRadius: "16px",
+                boxShadow: "0 32px 64px rgba(0,0,0,0.3)",
+              }}
+            />
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };

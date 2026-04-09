@@ -321,7 +321,7 @@ const AdminPage = () => {
           <div className="tw-w-full tw-max-w-md">
             <div className="tw-bg-white tw-rounded-2xl tw-shadow-xl tw-shadow-slate-200/50 tw-border tw-border-slate-200/60 tw-p-6 sm:tw-p-10">
               <div className="tw-text-center tw-mb-8">
-                <div className="tw-w-14 tw-h-14 tw-bg-gradient-to-br tw-from-slate-800 tw-to-slate-900 tw-rounded-2xl tw-flex tw-items-center tw-justify-center tw-mx-auto tw-mb-4 tw-text-xl">🔐</div>
+                <div className="tw-w-14 tw-h-14 tw-bg-gradient-to-br tw-from-slate-800 tw-to-slate-900 tw-rounded-2xl tw-flex tw-items-center tw-justify-center tw-mx-auto tw-mb-4 tw-text-xl"></div>
                 <h3 className="tw-text-xl sm:tw-text-2xl tw-font-extrabold tw-text-slate-800">Admin Login</h3>
                 <p className="tw-text-slate-500 tw-text-sm tw-mt-1">Enter password to manage book lists</p>
               </div>
@@ -373,7 +373,7 @@ const AdminPage = () => {
         <div className="tw-max-w-7xl tw-mx-auto">
           {/* Top Bar */}
           <div className="tw-flex tw-flex-col sm:tw-flex-row tw-items-start sm:tw-items-center tw-justify-between tw-gap-3 tw-mb-5">
-            <h3 className="tw-text-xl sm:tw-text-2xl tw-font-extrabold tw-text-slate-800">🏫 Admin Panel</h3>
+            <h3 className="tw-text-xl sm:tw-text-2xl tw-font-extrabold tw-text-slate-800">Admin Panel</h3>
             <button onClick={handleLogout}
               className="tw-px-4 tw-py-2 tw-bg-white tw-text-slate-600 tw-border-2 tw-border-slate-200 tw-rounded-lg tw-font-bold tw-text-xs sm:tw-text-sm hover:tw-border-slate-400 tw-transition-colors">
               Logout
@@ -384,11 +384,11 @@ const AdminPage = () => {
           <div className="tw-flex tw-gap-1 tw-bg-white tw-rounded-xl tw-p-1 tw-shadow-sm tw-border tw-border-slate-200/60 tw-mb-5">
             <button onClick={() => setAdminTab("books")}
               className={`tw-flex-1 tw-py-2.5 tw-rounded-lg tw-font-bold tw-text-xs sm:tw-text-sm tw-transition-all ${adminTab === "books" ? "tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-text-white tw-shadow-md" : "tw-text-slate-500 hover:tw-text-slate-800 hover:tw-bg-slate-50"}`}>
-              📚 Book Lists
+              Book Lists
             </button>
             <button onClick={() => setAdminTab("fees")}
               className={`tw-flex-1 tw-py-2.5 tw-rounded-lg tw-font-bold tw-text-xs sm:tw-text-sm tw-transition-all ${adminTab === "fees" ? "tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-text-white tw-shadow-md" : "tw-text-slate-500 hover:tw-text-slate-800 hover:tw-bg-slate-50"}`}>
-              💰 Fee Structure
+              Fee Structure
             </button>
           </div>
 
@@ -397,7 +397,7 @@ const AdminPage = () => {
 
           {/* Year Selector */}
           <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
-            <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">📅 Academic Year</h4>
+            <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">Academic Year</h4>
             <div className="tw-flex tw-flex-wrap tw-items-center tw-gap-2">
               {years.map((year) => (
                 <button key={year} onClick={() => setSelectedYear(year)}
@@ -442,7 +442,7 @@ const AdminPage = () => {
             <>
               {/* School Info */}
               <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
-                <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">🏫 School Information</h4>
+                <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">School Information</h4>
                 <div>
                   <label className="tw-block tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider tw-mb-1">School Name</label>
                   <input type="text" value={bookData.schoolName} onChange={(e) => updateSchoolName(e.target.value)}
@@ -522,7 +522,7 @@ const AdminPage = () => {
                             <input type="file" accept="image/*" className="tw-hidden" ref={(el) => (fileInputRefs.current[`front_${ci}_${bi}`] = el)}
                               onChange={(e) => handleImageUpload(ci, bi, "frontImage", e.target.files[0])} />
                             <button onClick={() => triggerFileInput(`front_${ci}_${bi}`)}
-                              className="tw-text-[10px] tw-px-2 tw-py-1 tw-bg-slate-100 tw-border tw-border-slate-200 tw-rounded tw-text-slate-500">📷 Upload</button>
+                              className="tw-text-[10px] tw-px-2 tw-py-1 tw-bg-slate-100 tw-border tw-border-slate-200 tw-rounded tw-text-slate-500">Upload</button>
                           </div>
                           {/* Back */}
                           <div className="tw-flex-1">
@@ -537,7 +537,7 @@ const AdminPage = () => {
                             <input type="file" accept="image/*" className="tw-hidden" ref={(el) => (fileInputRefs.current[`back_${ci}_${bi}`] = el)}
                               onChange={(e) => handleImageUpload(ci, bi, "backImage", e.target.files[0])} />
                             <button onClick={() => triggerFileInput(`back_${ci}_${bi}`)}
-                              className="tw-text-[10px] tw-px-2 tw-py-1 tw-bg-slate-100 tw-border tw-border-slate-200 tw-rounded tw-text-slate-500">📷 Upload</button>
+                              className="tw-text-[10px] tw-px-2 tw-py-1 tw-bg-slate-100 tw-border tw-border-slate-200 tw-rounded tw-text-slate-500">Upload</button>
                           </div>
                         </div>
                       </div>
@@ -574,7 +574,7 @@ const AdminPage = () => {
                                   </div>
                                 )}
                                 <input type="file" accept="image/*" className="tw-hidden" ref={(el) => (fileInputRefs.current[`front_${ci}_${bi}`] = el)} onChange={(e) => handleImageUpload(ci, bi, "frontImage", e.target.files[0])} />
-                                <button onClick={() => triggerFileInput(`front_${ci}_${bi}`)} className="tw-text-xs tw-px-3 tw-py-1 tw-bg-slate-100 tw-border tw-border-slate-200 tw-rounded-md tw-text-slate-500 hover:tw-bg-slate-200 tw-transition-colors tw-whitespace-nowrap">📷 Upload</button>
+                                <button onClick={() => triggerFileInput(`front_${ci}_${bi}`)} className="tw-text-xs tw-px-3 tw-py-1 tw-bg-slate-100 tw-border tw-border-slate-200 tw-rounded-md tw-text-slate-500 hover:tw-bg-slate-200 tw-transition-colors tw-whitespace-nowrap">Upload</button>
                               </div>
                             </td>
                             <td className="tw-px-3 tw-py-3">
@@ -586,7 +586,7 @@ const AdminPage = () => {
                                   </div>
                                 )}
                                 <input type="file" accept="image/*" className="tw-hidden" ref={(el) => (fileInputRefs.current[`back_${ci}_${bi}`] = el)} onChange={(e) => handleImageUpload(ci, bi, "backImage", e.target.files[0])} />
-                                <button onClick={() => triggerFileInput(`back_${ci}_${bi}`)} className="tw-text-xs tw-px-3 tw-py-1 tw-bg-slate-100 tw-border tw-border-slate-200 tw-rounded-md tw-text-slate-500 hover:tw-bg-slate-200 tw-transition-colors tw-whitespace-nowrap">📷 Upload</button>
+                                <button onClick={() => triggerFileInput(`back_${ci}_${bi}`)} className="tw-text-xs tw-px-3 tw-py-1 tw-bg-slate-100 tw-border tw-border-slate-200 tw-rounded-md tw-text-slate-500 hover:tw-bg-slate-200 tw-transition-colors tw-whitespace-nowrap">Upload</button>
                               </div>
                             </td>
                             <td className="tw-px-3 tw-py-3">
@@ -617,7 +617,7 @@ const AdminPage = () => {
               <div className="tw-text-center tw-mt-5 tw-mb-4">
                 <button onClick={handleSave} disabled={saving}
                   className="tw-w-full sm:tw-w-auto tw-px-10 tw-py-3 tw-bg-emerald-500 tw-text-white tw-rounded-xl tw-font-bold tw-text-sm sm:tw-text-base hover:tw-bg-emerald-600 tw-transition-colors disabled:tw-opacity-60 tw-shadow-lg tw-shadow-emerald-500/20">
-                  {saving ? "⏳ Saving..." : "💾 Save All Changes"}
+                  {saving ? "Saving..." : "Save All Changes"}
                 </button>
               </div>
             </>
@@ -630,7 +630,7 @@ const AdminPage = () => {
             <>
               {/* Fee Year Selector */}
               <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
-                <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">📅 Fee Structure Year</h4>
+                <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">Fee Structure Year</h4>
                 <div className="tw-flex tw-flex-wrap tw-items-center tw-gap-2">
                   {feeYears.map((yr) => (
                     <button key={yr} onClick={() => setSelectedFeeYear(yr)}
@@ -677,7 +677,7 @@ const AdminPage = () => {
                 <>
                   {/* School Name */}
                   <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
-                    <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">📋 Fee Details</h4>
+                    <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">Fee Details</h4>
                     <div>
                       <label className="tw-block tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-mb-1">School Name</label>
                       <input type="text" value={feeData.schoolName} onChange={(e) => setFeeData((p) => ({ ...p, schoolName: e.target.value }))}
@@ -687,7 +687,7 @@ const AdminPage = () => {
 
                   {/* Classes (columns) */}
                   <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
-                    <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">🎓 Classes</h4>
+                    <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">Classes</h4>
                     <div className="tw-flex tw-flex-wrap tw-gap-2 tw-mb-3">
                       {feeData.classes.map((cls, i) => (
                         <div key={i} className="tw-flex tw-items-center tw-gap-1 tw-bg-slate-100 tw-border tw-border-slate-200 tw-rounded-lg tw-px-3 tw-py-1.5">
@@ -707,7 +707,7 @@ const AdminPage = () => {
                   {/* Fee Table */}
                   <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-overflow-hidden tw-mb-5">
                     <div className="tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-px-4 sm:tw-px-6 tw-py-4">
-                      <h4 className="tw-text-white tw-font-bold tw-text-sm sm:tw-text-base">💰 Fee Amounts</h4>
+                      <h4 className="tw-text-white tw-font-bold tw-text-sm sm:tw-text-base">Fee Amounts</h4>
                     </div>
 
                     {/* Mobile: card per category */}
@@ -784,7 +784,7 @@ const AdminPage = () => {
 
                   {/* Notes */}
                   <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
-                    <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">📝 Notes</h4>
+                    <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">Notes</h4>
                     <textarea value={feeData.notes || ""} onChange={(e) => setFeeData((p) => ({ ...p, notes: e.target.value }))}
                       rows={3} placeholder="Any additional notes (shown on the public fee structure page)"
                       className="tw-w-full tw-px-3 tw-py-2.5 tw-border-2 tw-border-slate-200 tw-rounded-xl tw-text-sm tw-outline-none focus:tw-border-amber-500 tw-resize-y" />
@@ -794,7 +794,7 @@ const AdminPage = () => {
                   <div className="tw-text-center tw-mt-5 tw-mb-4">
                     <button onClick={handleSaveFees} disabled={feeSaving}
                       className="tw-w-full sm:tw-w-auto tw-px-10 tw-py-3 tw-bg-emerald-500 tw-text-white tw-rounded-xl tw-font-bold tw-text-sm sm:tw-text-base hover:tw-bg-emerald-600 tw-transition-colors disabled:tw-opacity-60 tw-shadow-lg tw-shadow-emerald-500/20">
-                      {feeSaving ? "⏳ Saving..." : "💾 Save Fee Structure"}
+                      {feeSaving ? "Saving..." : "Save Fee Structure"}
                     </button>
                   </div>
                 </>
