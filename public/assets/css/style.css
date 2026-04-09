@@ -2079,6 +2079,22 @@ button {
   background: transparent;
   z-index: 999;
 }
+@media (max-width: 991px) {
+  .header-section {
+    position: relative !important;
+    background: #fff;
+  }
+  .header-wrapper {
+    padding: 10px 0;
+  }
+  .header-wrapper .logo {
+    width: auto;
+  }
+  .header-wrapper .logo a img {
+    max-height: 50px;
+    width: auto;
+  }
+}
 .header-section.header-fixed {
   position: fixed;
   top: 0;
@@ -2427,11 +2443,6 @@ button {
 }
 .header-wrapper .logo a img {
   max-width: 100%;
-}
-@media (max-width: 575px) {
-  .header-wrapper .logo {
-    width: 160px;
-  }
 }
 @media (max-width: 1199px) and (min-width: 992px) {
   .header-wrapper .logo {

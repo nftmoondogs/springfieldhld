@@ -429,7 +429,7 @@ const AdminPage = () => {
             {selectedYear && (
               <button onClick={handleDeleteYear}
                 className="tw-mt-3 tw-px-3 tw-py-1.5 tw-rounded-lg tw-font-bold tw-text-xs tw-bg-red-50 tw-text-red-500 tw-border tw-border-red-200 hover:tw-bg-red-500 hover:tw-text-white tw-transition-colors">
-                🗑️ Delete {selectedYear}
+                Delete {selectedYear}
               </button>
             )}
           </div>
@@ -660,7 +660,7 @@ const AdminPage = () => {
                 {selectedFeeYear && (
                   <button onClick={handleDeleteFeeYear}
                     className="tw-mt-3 tw-px-3 tw-py-1.5 tw-rounded-lg tw-font-bold tw-text-xs tw-bg-red-50 tw-text-red-500 tw-border tw-border-red-200 hover:tw-bg-red-500 hover:tw-text-white tw-transition-colors">
-                    🗑️ Delete {selectedFeeYear}
+                    Delete {selectedFeeYear}
                   </button>
                 )}
               </div>
