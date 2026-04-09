@@ -1,3 +1,51 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Override theme banner-section styles that conflict with Tailwind layout */
+.banner-section .tw-flex {
+  display: flex !important;
+}
+
+.banner-section .tw-text-center {
+  text-align: center !important;
+}
+
+.banner-section .tw-inline-flex {
+  display: inline-flex !important;
+}
+
+/* Ensure Tailwind links override theme link color resets */
+a.tw-bg-amber-500 {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+a.tw-bg-amber-500:hover,
+a.tw-bg-amber-500:focus,
+a.tw-bg-amber-500:active,
+a.tw-bg-amber-500:visited {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+a.tw-border-2 {
+  text-decoration: none !important;
+}
+
+/* Fix mobile banner spacing - the theme adds excessive padding */
+@media (max-width: 991px) {
+  .banner-section {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .banner-section .banner-content {
+    padding: 0 !important;
+  }
+
+  .banner-section .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}

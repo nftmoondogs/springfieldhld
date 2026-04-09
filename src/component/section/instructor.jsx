@@ -7,41 +7,32 @@ const contactList = [
 
 const Instructor = () => {
   return (
-    <section className="tw-py-14 sm:tw-py-20 tw-bg-slate-50">
-      <div className="tw-container tw-mx-auto tw-px-4 sm:tw-px-6 lg:tw-px-8">
-        {/* Header */}
-        <div className="tw-text-center tw-mb-10">
-          <span className="tw-text-xs tw-font-bold tw-text-amber-500 tw-uppercase tw-tracking-widest tw-mb-2 tw-block">Get In Touch</span>
-          <h2 className="tw-text-3xl sm:tw-text-4xl tw-font-extrabold tw-text-slate-900 tw-tracking-tight">Contact Us</h2>
-          <p className="tw-text-slate-500 tw-mt-2 tw-text-sm sm:tw-text-base">Reach out through any of the channels below.</p>
+    <section style={{padding: '60px 0', background: '#f8fafc'}}>
+      <div className="container">
+        <div style={{textAlign: 'center', marginBottom: '36px'}}>
+          <span style={{fontSize: '11px', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px', display: 'block'}}>Get In Touch</span>
+          <h2 style={{fontSize: '32px', fontWeight: 800, color: '#0f172a'}}>Contact Us</h2>
+          <p style={{color: '#64748b', marginTop: '8px', fontSize: '15px'}}>Reach out through any of the channels below.</p>
         </div>
 
-        <div className="tw-flex tw-flex-col lg:tw-flex-row tw-gap-8 tw-items-stretch">
-          {/* Map / Image — large */}
-          <div className="tw-flex-1">
-            <div className="tw-rounded-2xl tw-overflow-hidden tw-shadow-xl tw-shadow-slate-200/50 tw-border tw-border-slate-100 tw-h-full tw-min-h-[300px]">
-              <img src="assets/images/choose/01.png" alt="School Location" className="tw-w-full tw-h-full tw-object-cover" />
+        <div className="row g-4">
+          <div className="col-lg-7">
+            <div style={{borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 40px -12px rgba(0,0,0,0.08)', border: '1px solid #f1f5f9', height: '100%', minHeight: '280px'}}>
+              <img src="assets/images/choose/01.png" alt="School Location" style={{width: '100%', height: '100%', objectFit: 'cover', display: 'block'}} />
             </div>
           </div>
-
-          {/* Contact Cards */}
-          <div className="tw-flex-shrink-0 tw-w-full lg:tw-w-auto lg:tw-min-w-[360px]">
-            <div className="tw-space-y-3">
-              {contactList.map((item, i) => (
-                <div
-                  key={i}
-                  className="tw-flex tw-items-start tw-gap-4 tw-p-5 tw-bg-white tw-border tw-border-slate-200/60 tw-rounded-xl tw-shadow-sm hover:tw-shadow-md hover:tw-border-amber-200 tw-transition-all tw-duration-200"
-                >
-                  <div className="tw-w-11 tw-h-11 tw-bg-amber-50 tw-border tw-border-amber-200/50 tw-rounded-xl tw-flex tw-items-center tw-justify-center tw-text-lg tw-shrink-0">
-                    {item.icon}
-                  </div>
-                  <div>
-                    <h4 className="tw-text-xs tw-font-bold tw-text-slate-400 tw-uppercase tw-tracking-wider tw-mb-0.5">{item.title}</h4>
-                    <p className="tw-text-slate-800 tw-text-sm tw-font-medium tw-leading-relaxed">{item.desc}</p>
-                  </div>
+          <div className="col-lg-5">
+            {contactList.map((item, i) => (
+              <div key={i} style={{display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '16px 18px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', marginBottom: i < contactList.length - 1 ? '10px' : '0', transition: 'all 0.2s'}}>
+                <div style={{width: '42px', height: '42px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0}}>
+                  {item.icon}
                 </div>
-              ))}
-            </div>
+                <div>
+                  <h4 style={{fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px'}}>{item.title}</h4>
+                  <p style={{fontSize: '14px', fontWeight: 500, color: '#1e293b', lineHeight: 1.5, margin: 0}}>{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
