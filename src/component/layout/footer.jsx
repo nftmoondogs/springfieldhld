@@ -118,7 +118,7 @@ const Footer = () => {
             {/* Copyright */}
             <div style={{ padding: "20px 0", textAlign: "center" }}>
               <p style={{ color: "#64748b", fontSize: "13px", margin: 0 }}>
-                &copy; 2026 Spring Field Junior High School. All rights reserved.
+                &copy; 2026 Spring Field Junior High School
               </p>
             </div>
           </div>
