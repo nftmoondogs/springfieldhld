@@ -12,12 +12,11 @@ const AboutPage = () => {
 
   return (
     <Fragment>
-      <Header hidelogo />
       {/* Custom page header */}
       <section
         style={{
           background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-          padding: "100px 0 60px",
+          padding: "60px 0",
           position: "relative",
           overflow: "hidden",
         }}
