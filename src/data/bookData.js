@@ -42,7 +42,7 @@ export const migrateOldData = async () => {
           let hasInlineImages = false;
           for (const book of books) {
             if ((book.frontImage && book.frontImage.length > 100) ||
-                (book.backImage && book.backImage.length > 100)) {
+              (book.backImage && book.backImage.length > 100)) {
               hasInlineImages = true;
               break;
             }

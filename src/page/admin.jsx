@@ -14,6 +14,7 @@ import {
   generateBookId,
   generateClassId,
 } from "../data/bookData";
+import { getFeeData, saveFeeData } from "../data/feeData";
 
 const ADMIN_PASSWORD = "Suzain@1918";
 
@@ -33,6 +34,12 @@ const AdminPage = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const fileInputRefs = useRef({});
+  const [adminTab, setAdminTab] = useState("books");
+  const [feeData, setFeeData] = useState(null);
+  const [feeLoading, setFeeLoading] = useState(false);
+  const [feeSaving, setFeeSaving] = useState(false);
+  const [newClassName, setNewClassName] = useState("");
+  const [newCatName, setNewCatName] = useState("");
   const [dragIndex, setDragIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
 
@@ -64,6 +71,73 @@ const AdminPage = () => {
     };
     fetchYears();
   }, [authenticated]);
+
+  // Fetch fee data when tab switches
+  useEffect(() => {
+    if (adminTab !== "fees" || !authenticated || feeData) return;
+    const fetchFees = async () => {
+      setFeeLoading(true);
+      const data = await getFeeData();
+      setFeeData(data);
+      setFeeLoading(false);
+    };
+    fetchFees();
+  }, [adminTab, authenticated]);
+
+  const handleSaveFees = async () => {
+    setFeeSaving(true);
+    const success = await saveFeeData(feeData);
+    setFeeSaving(false);
+    showToastMsg(success ? "✅ Fee structure saved!" : "❌ Error saving.");
+  };
+
+  const updateFee = (catIndex, className, value) => {
+    setFeeData((p) => {
+      const cats = [...p.feeCategories];
+      cats[catIndex] = { ...cats[catIndex], fees: { ...cats[catIndex].fees, [className]: value } };
+      return { ...p, feeCategories: cats };
+    });
+  };
+
+  const addFeeClass = () => {
+    if (!newClassName.trim()) return;
+    setFeeData((p) => ({ ...p, classes: [...p.classes, newClassName.trim().toUpperCase()] }));
+    setNewClassName("");
+  };
+
+  const removeFeeClass = (index) => {
+    setFeeData((p) => {
+      const cls = p.classes[index];
+      const cats = p.feeCategories.map((cat) => {
+        const fees = { ...cat.fees };
+        delete fees[cls];
+        return { ...cat, fees };
+      });
+      return { ...p, classes: p.classes.filter((_, i) => i !== index), feeCategories: cats };
+    });
+  };
+
+  const addFeeCategory = () => {
+    if (!newCatName.trim()) return;
+    const id = `cat_${Date.now()}`;
+    setFeeData((p) => ({
+      ...p,
+      feeCategories: [...p.feeCategories, { id, name: newCatName.trim(), fees: {} }],
+    }));
+    setNewCatName("");
+  };
+
+  const removeFeeCategory = (index) => {
+    setFeeData((p) => ({ ...p, feeCategories: p.feeCategories.filter((_, i) => i !== index) }));
+  };
+
+  const updateFeeCategoryName = (index, name) => {
+    setFeeData((p) => {
+      const cats = [...p.feeCategories];
+      cats[index] = { ...cats[index], name };
+      return { ...p, feeCategories: cats };
+    });
+  };
 
   useEffect(() => {
     if (!selectedYear || !authenticated) return;
@@ -253,18 +327,27 @@ const AdminPage = () => {
         <div className="tw-max-w-7xl tw-mx-auto">
           {/* Top Bar */}
           <div className="tw-flex tw-flex-col sm:tw-flex-row tw-items-start sm:tw-items-center tw-justify-between tw-gap-3 tw-mb-5">
-            <h3 className="tw-text-xl sm:tw-text-2xl tw-font-extrabold tw-text-slate-800">📚 Book List Manager</h3>
-            <div className="tw-flex tw-flex-wrap tw-gap-2">
-              <button onClick={handleSave} disabled={saving || !selectedYear}
-                className="tw-px-4 tw-py-2 tw-bg-emerald-500 tw-text-white tw-rounded-lg tw-font-bold tw-text-xs sm:tw-text-sm hover:tw-bg-emerald-600 tw-transition-colors disabled:tw-opacity-60 tw-shadow-sm">
-                {saving ? "⏳ Saving..." : "💾 Save"}
-              </button>
-              <button onClick={handleLogout}
-                className="tw-px-4 tw-py-2 tw-bg-white tw-text-slate-600 tw-border-2 tw-border-slate-200 tw-rounded-lg tw-font-bold tw-text-xs sm:tw-text-sm hover:tw-border-slate-400 tw-transition-colors">
-                Logout
-              </button>
-            </div>
+            <h3 className="tw-text-xl sm:tw-text-2xl tw-font-extrabold tw-text-slate-800">🏫 Admin Panel</h3>
+            <button onClick={handleLogout}
+              className="tw-px-4 tw-py-2 tw-bg-white tw-text-slate-600 tw-border-2 tw-border-slate-200 tw-rounded-lg tw-font-bold tw-text-xs sm:tw-text-sm hover:tw-border-slate-400 tw-transition-colors">
+              Logout
+            </button>
           </div>
+
+          {/* Tabs */}
+          <div className="tw-flex tw-gap-1 tw-bg-white tw-rounded-xl tw-p-1 tw-shadow-sm tw-border tw-border-slate-200/60 tw-mb-5">
+            <button onClick={() => setAdminTab("books")}
+              className={`tw-flex-1 tw-py-2.5 tw-rounded-lg tw-font-bold tw-text-xs sm:tw-text-sm tw-transition-all ${adminTab === "books" ? "tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-text-white tw-shadow-md" : "tw-text-slate-500 hover:tw-text-slate-800 hover:tw-bg-slate-50"}`}>
+              📚 Book Lists
+            </button>
+            <button onClick={() => setAdminTab("fees")}
+              className={`tw-flex-1 tw-py-2.5 tw-rounded-lg tw-font-bold tw-text-xs sm:tw-text-sm tw-transition-all ${adminTab === "fees" ? "tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-text-white tw-shadow-md" : "tw-text-slate-500 hover:tw-text-slate-800 hover:tw-bg-slate-50"}`}>
+              💰 Fee Structure
+            </button>
+          </div>
+
+          {adminTab === "books" && (
+          <>
 
           {/* Year Selector */}
           <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
@@ -491,6 +574,152 @@ const AdminPage = () => {
                   {saving ? "⏳ Saving..." : "💾 Save All Changes"}
                 </button>
               </div>
+            </>
+          )}
+          </>
+          )}
+
+          {/* Fee Structure Tab */}
+          {adminTab === "fees" && (
+            <>
+              {feeLoading ? (
+                <div className="tw-flex tw-items-center tw-justify-center tw-py-20">
+                  <div className="tw-w-10 tw-h-10 tw-border-4 tw-border-slate-200 tw-border-t-amber-500 tw-rounded-full tw-animate-spin"></div>
+                </div>
+              ) : feeData ? (
+                <>
+                  {/* Session & School */}
+                  <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
+                    <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">📋 Fee Details</h4>
+                    <div className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
+                      <div>
+                        <label className="tw-block tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-mb-1">School Name</label>
+                        <input type="text" value={feeData.schoolName} onChange={(e) => setFeeData((p) => ({ ...p, schoolName: e.target.value }))}
+                          className="tw-w-full tw-px-3 tw-py-2.5 tw-border-2 tw-border-slate-200 tw-rounded-xl tw-text-sm tw-outline-none focus:tw-border-amber-500" />
+                      </div>
+                      <div>
+                        <label className="tw-block tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-mb-1">Session / Year</label>
+                        <input type="text" value={feeData.session} onChange={(e) => setFeeData((p) => ({ ...p, session: e.target.value }))}
+                          placeholder="e.g. 2026-2027"
+                          className="tw-w-full tw-px-3 tw-py-2.5 tw-border-2 tw-border-slate-200 tw-rounded-xl tw-text-sm tw-outline-none focus:tw-border-amber-500" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Classes (columns) */}
+                  <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
+                    <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">🎓 Classes</h4>
+                    <div className="tw-flex tw-flex-wrap tw-gap-2 tw-mb-3">
+                      {feeData.classes.map((cls, i) => (
+                        <div key={i} className="tw-flex tw-items-center tw-gap-1 tw-bg-slate-100 tw-border tw-border-slate-200 tw-rounded-lg tw-px-3 tw-py-1.5">
+                          <span className="tw-text-xs tw-font-bold tw-text-slate-700">{cls}</span>
+                          <button onClick={() => removeFeeClass(i)} className="tw-text-red-400 hover:tw-text-red-600 tw-text-xs tw-ml-1">✕</button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="tw-flex tw-gap-2">
+                      <input type="text" value={newClassName} onChange={(e) => setNewClassName(e.target.value)}
+                        placeholder="Add class (e.g. IX)" onKeyDown={(e) => e.key === "Enter" && addFeeClass()}
+                        className="tw-px-3 tw-py-2 tw-border tw-border-slate-200 tw-rounded-lg tw-text-sm tw-outline-none focus:tw-border-amber-500 tw-w-40" />
+                      <button onClick={addFeeClass} className="tw-px-3 tw-py-2 tw-bg-slate-800 tw-text-white tw-rounded-lg tw-font-bold tw-text-xs">+ Add</button>
+                    </div>
+                  </div>
+
+                  {/* Fee Table */}
+                  <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-overflow-hidden tw-mb-5">
+                    <div className="tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-px-4 sm:tw-px-6 tw-py-4">
+                      <h4 className="tw-text-white tw-font-bold tw-text-sm sm:tw-text-base">💰 Fee Amounts</h4>
+                    </div>
+
+                    {/* Mobile: card per category */}
+                    <div className="sm:tw-hidden tw-p-3">
+                      {feeData.feeCategories.map((cat, catIdx) => (
+                        <div key={cat.id} className="tw-border tw-border-slate-200 tw-rounded-lg tw-p-3 tw-mb-3 last:tw-mb-0">
+                          <div className="tw-flex tw-items-center tw-justify-between tw-mb-2">
+                            <input type="text" value={cat.name} onChange={(e) => updateFeeCategoryName(catIdx, e.target.value)}
+                              className="tw-flex-1 tw-text-sm tw-font-bold tw-text-slate-700 tw-border-b tw-border-transparent focus:tw-border-amber-400 tw-outline-none tw-mr-2" />
+                            <button onClick={() => removeFeeCategory(catIdx)} className="tw-w-6 tw-h-6 tw-bg-red-50 tw-text-red-500 tw-rounded tw-text-xs tw-flex tw-items-center tw-justify-center">✕</button>
+                          </div>
+                          <div className="tw-grid tw-grid-cols-2 tw-gap-2">
+                            {feeData.classes.map((cls, ci) => (
+                              <div key={ci}>
+                                <label className="tw-text-[10px] tw-font-bold tw-text-slate-400 tw-uppercase">{cls}</label>
+                                <input type="number" value={cat.fees[cls] || ""}
+                                  onChange={(e) => updateFee(catIdx, cls, e.target.value)}
+                                  placeholder="0" min="0"
+                                  className="tw-w-full tw-px-2 tw-py-1.5 tw-border tw-border-slate-200 tw-rounded tw-text-xs tw-outline-none focus:tw-border-amber-500" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Desktop: full table */}
+                    <div className="tw-hidden sm:tw-block tw-overflow-x-auto tw-p-4">
+                      <table className="tw-w-full tw-text-sm">
+                        <thead>
+                          <tr className="tw-border-b-2 tw-border-slate-200">
+                            <th className="tw-px-3 tw-py-2.5 tw-text-left tw-text-xs tw-font-bold tw-text-slate-400 tw-uppercase tw-min-w-[160px]">Category</th>
+                            {feeData.classes.map((cls, i) => (
+                              <th key={i} className="tw-px-2 tw-py-2.5 tw-text-center tw-text-xs tw-font-bold tw-text-slate-400 tw-uppercase tw-min-w-[80px]">{cls}</th>
+                            ))}
+                            <th className="tw-w-10"></th>
+                          </tr>
+                        </thead>
+                        <tbody className="tw-divide-y tw-divide-slate-100">
+                          {feeData.feeCategories.map((cat, catIdx) => (
+                            <tr key={cat.id} className="hover:tw-bg-slate-50/50">
+                              <td className="tw-px-3 tw-py-2">
+                                <input type="text" value={cat.name} onChange={(e) => updateFeeCategoryName(catIdx, e.target.value)}
+                                  className="tw-w-full tw-px-2 tw-py-1.5 tw-border tw-border-slate-200 tw-rounded tw-text-sm tw-outline-none focus:tw-border-amber-500" />
+                              </td>
+                              {feeData.classes.map((cls, ci) => (
+                                <td key={ci} className="tw-px-2 tw-py-2">
+                                  <input type="number" value={cat.fees[cls] || ""}
+                                    onChange={(e) => updateFee(catIdx, cls, e.target.value)}
+                                    placeholder="0" min="0"
+                                    className="tw-w-full tw-px-2 tw-py-1.5 tw-border tw-border-slate-200 tw-rounded tw-text-sm tw-text-center tw-outline-none focus:tw-border-amber-500" />
+                                </td>
+                              ))}
+                              <td className="tw-px-2 tw-py-2">
+                                <button onClick={() => removeFeeCategory(catIdx)}
+                                  className="tw-w-7 tw-h-7 tw-bg-red-50 tw-text-red-500 tw-rounded tw-font-bold tw-text-xs tw-flex tw-items-center tw-justify-center hover:tw-bg-red-500 hover:tw-text-white tw-transition-colors">✕</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Add Category */}
+                    <div className="tw-px-4 tw-pb-4">
+                      <div className="tw-flex tw-gap-2 tw-pt-3 tw-border-t tw-border-slate-100">
+                        <input type="text" value={newCatName} onChange={(e) => setNewCatName(e.target.value)}
+                          placeholder="New fee category name" onKeyDown={(e) => e.key === "Enter" && addFeeCategory()}
+                          className="tw-flex-1 tw-px-3 tw-py-2 tw-border tw-border-slate-200 tw-rounded-lg tw-text-sm tw-outline-none focus:tw-border-amber-500" />
+                        <button onClick={addFeeCategory} className="tw-px-4 tw-py-2 tw-bg-slate-800 tw-text-white tw-rounded-lg tw-font-bold tw-text-xs">+ Add Category</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Notes */}
+                  <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
+                    <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">📝 Notes</h4>
+                    <textarea value={feeData.notes || ""} onChange={(e) => setFeeData((p) => ({ ...p, notes: e.target.value }))}
+                      rows={3} placeholder="Any additional notes (shown on the public fee structure page)"
+                      className="tw-w-full tw-px-3 tw-py-2.5 tw-border-2 tw-border-slate-200 tw-rounded-xl tw-text-sm tw-outline-none focus:tw-border-amber-500 tw-resize-y" />
+                  </div>
+
+                  {/* Save Fees */}
+                  <div className="tw-text-center tw-mt-5 tw-mb-4">
+                    <button onClick={handleSaveFees} disabled={feeSaving}
+                      className="tw-w-full sm:tw-w-auto tw-px-10 tw-py-3 tw-bg-emerald-500 tw-text-white tw-rounded-xl tw-font-bold tw-text-sm sm:tw-text-base hover:tw-bg-emerald-600 tw-transition-colors disabled:tw-opacity-60 tw-shadow-lg tw-shadow-emerald-500/20">
+                      {feeSaving ? "⏳ Saving..." : "💾 Save Fee Structure"}
+                    </button>
+                  </div>
+                </>
+              ) : null}
             </>
           )}
         </div>
