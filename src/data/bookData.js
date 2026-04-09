@@ -111,13 +111,58 @@ export const deleteYear = async (year) => {
   }
 };
 
-// Convert file to base64 string
+// Compress and convert image file to base64 (auto-compresses to under ~800KB)
 export const fileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const MAX_SIZE = 800 * 1024; // 800KB target
+      let { width, height } = img;
+
+      // Scale down large images (max 1200px on longest side)
+      const MAX_DIM = 1200;
+      if (width > MAX_DIM || height > MAX_DIM) {
+        const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Try progressively lower quality until under target size
+      let quality = 0.8;
+      let result = canvas.toDataURL("image/jpeg", quality);
+
+      while (result.length > MAX_SIZE && quality > 0.1) {
+        quality -= 0.1;
+        result = canvas.toDataURL("image/jpeg", quality);
+      }
+
+      // If still too large, scale down further
+      if (result.length > MAX_SIZE) {
+        const scale = 0.6;
+        canvas.width = Math.round(width * scale);
+        canvas.height = Math.round(height * scale);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        result = canvas.toDataURL("image/jpeg", 0.6);
+      }
+
+      resolve(result);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to load image"));
+    };
+
+    img.src = url;
   });
 };
 

@@ -161,7 +161,7 @@ const AdminPage = () => {
 
   const handleImageUpload = useCallback(async (ci, bi, field, file) => {
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { alert("Image must be under 2MB"); return; }
+    if (file.size > 10 * 1024 * 1024) { alert("Image must be under 10MB"); return; }
     try {
       const base64 = await fileToBase64(file);
       updateBook(ci, bi, field, base64);
