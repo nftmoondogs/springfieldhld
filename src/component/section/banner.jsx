@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 
 const Banner = () => {
   return (
-    <section className="tw-relative tw-overflow-hidden tw-bg-gradient-to-b tw-from-amber-50/50 tw-via-white tw-to-white tw-py-12 sm:tw-py-16 lg:tw-py-20">
-      <div className="tw-container tw-mx-auto tw-px-4 sm:tw-px-6 lg:tw-px-8">
+    <section className="banner-section tw-relative tw-overflow-hidden tw-bg-gradient-to-b tw-from-amber-50/50 tw-via-white tw-to-white tw-py-12 sm:tw-py-16 lg:tw-py-20">
+      <div className="container">
         <div className="tw-flex tw-flex-col lg:tw-flex-row tw-items-center tw-gap-8 lg:tw-gap-14">
           {/* Left Content */}
           <div className="tw-flex-1 tw-text-center lg:tw-text-left">
@@ -22,7 +22,7 @@ const Banner = () => {
             </p>
 
             <div className="tw-flex tw-flex-col sm:tw-flex-row tw-gap-3 tw-justify-center lg:tw-justify-start">
-              <Link to="/about" className="tw-inline-flex tw-items-center tw-justify-center tw-gap-2 tw-px-7 tw-py-3.5 tw-bg-slate-900 tw-text-white tw-rounded-xl tw-font-bold tw-text-sm tw-shadow-lg tw-shadow-slate-900/20 hover:tw-bg-slate-800 tw-transition-all hover:-tw-translate-y-0.5">
+              <Link to="/about" className="tw-inline-flex tw-items-center tw-justify-center tw-gap-2 tw-px-7 tw-py-3.5 tw-bg-amber-500 tw-text-white tw-rounded-xl tw-font-bold tw-text-sm tw-shadow-lg tw-shadow-amber-500/25 hover:tw-bg-amber-600 tw-transition-all hover:-tw-translate-y-0.5">
                 📚 View Book Lists
               </Link>
               <Link to="/blog" className="tw-inline-flex tw-items-center tw-justify-center tw-gap-2 tw-px-7 tw-py-3.5 tw-bg-white tw-border-2 tw-border-slate-200 tw-text-slate-700 tw-rounded-xl tw-font-bold tw-text-sm hover:tw-border-amber-400 hover:tw-text-amber-600 tw-transition-all">
