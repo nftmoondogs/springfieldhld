@@ -68,7 +68,7 @@ const BlogPage = () => {
                           : "tw-bg-white tw-text-slate-600 tw-border-slate-200 hover:tw-border-amber-400 hover:tw-text-amber-600"
                       }`}
                     >
-                      💰 {year}
+                      {year}
                     </button>
                   ))}
                 </div>
