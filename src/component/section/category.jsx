@@ -1,23 +1,14 @@
 const Category = () => {
   return (
-    <section className="tw-relative tw-py-16 sm:tw-py-24 tw-bg-slate-50 tw-overflow-hidden">
-      {/* Background accent */}
-      <div className="tw-absolute tw-bottom-0 tw-left-0 tw-w-1/3 tw-h-full tw-bg-gradient-to-r tw-from-amber-50/30 tw-to-transparent"></div>
-
-      <div className="tw-container tw-mx-auto tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-relative tw-z-10">
-        <div className="tw-flex tw-flex-col lg:tw-flex-row tw-items-center tw-gap-12 lg:tw-gap-20">
+    <section className="tw-py-14 sm:tw-py-20 tw-bg-slate-50">
+      <div className="tw-container tw-mx-auto tw-px-4 sm:tw-px-6 lg:tw-px-8">
+        <div className="tw-flex tw-flex-col lg:tw-flex-row tw-items-center tw-gap-10 lg:tw-gap-16">
           {/* Left Content */}
           <div className="tw-flex-1 tw-order-2 lg:tw-order-1">
-            <div className="tw-inline-flex tw-items-center tw-gap-2 tw-px-3 tw-py-1 tw-bg-white tw-border tw-border-slate-200 tw-rounded-full tw-mb-4 tw-shadow-sm">
-              <span className="tw-w-1.5 tw-h-1.5 tw-bg-emerald-500 tw-rounded-full"></span>
-              <span className="tw-text-xs tw-font-semibold tw-text-slate-500 tw-uppercase tw-tracking-wider">Our Vision</span>
-            </div>
+            <span className="tw-text-xs tw-font-bold tw-text-emerald-600 tw-uppercase tw-tracking-widest tw-mb-2 tw-block">Our Vision</span>
 
             <h2 className="tw-text-3xl sm:tw-text-4xl tw-font-extrabold tw-text-slate-900 tw-tracking-tight tw-mb-6">
-              Shaping Tomorrow's
-              <span className="tw-block tw-bg-gradient-to-r tw-from-emerald-600 tw-to-teal-500 tw-bg-clip-text tw-text-transparent">
-                Leaders & Thinkers
-              </span>
+              Shaping Tomorrow's Leaders
             </h2>
 
             <div className="tw-space-y-4 tw-text-slate-600 tw-leading-relaxed tw-text-sm sm:tw-text-base">
@@ -45,13 +36,10 @@ const Category = () => {
             </div>
           </div>
 
-          {/* Right Image */}
-          <div className="tw-flex-1 tw-order-1 lg:tw-order-2 tw-w-full lg:tw-w-auto">
-            <div className="tw-relative tw-max-w-md tw-mx-auto lg:tw-mx-0">
-              <div className="tw-absolute -tw-inset-4 tw-bg-gradient-to-br tw-from-emerald-100 tw-to-teal-50 tw-rounded-3xl"></div>
-              <div className="tw-relative tw-rounded-2xl tw-overflow-hidden tw-shadow-xl tw-border tw-border-slate-200/50">
-                <img src="assets/images/banner/01.png" alt="Our Vision" className="tw-w-full tw-h-auto" />
-              </div>
+          {/* Right Image — large */}
+          <div className="tw-flex-1 tw-order-1 lg:tw-order-2 tw-w-full">
+            <div className="tw-rounded-2xl tw-overflow-hidden tw-shadow-xl tw-shadow-slate-200/50 tw-border tw-border-slate-100">
+              <img src="assets/images/banner/01.png" alt="Our Vision" className="tw-w-full tw-h-auto tw-block" />
             </div>
           </div>
         </div>
