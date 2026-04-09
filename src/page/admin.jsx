@@ -374,7 +374,7 @@ const AdminPage = () => {
                         />
                         <div className="tw-flex tw-items-center tw-gap-3 tw-mb-2">
                           <label className="tw-text-xs tw-font-bold tw-text-slate-500 tw-shrink-0">Price ₹</label>
-                          <input type="number" value={book.price} min="0" step="0.01"
+                          <input type="number" value={book.price || ""} min="0" step="0.01"
                             onChange={(e) => updateBook(ci, bi, "price", parseFloat(e.target.value) || 0)}
                             className="tw-w-24 tw-px-3 tw-py-2 tw-border tw-border-slate-200 tw-rounded-lg tw-text-sm tw-outline-none focus:tw-border-amber-500"
                           />
@@ -465,7 +465,7 @@ const AdminPage = () => {
                                 className="tw-w-full tw-px-3 tw-py-2 tw-border tw-border-slate-200 tw-rounded-lg tw-text-sm tw-outline-none focus:tw-border-amber-500" />
                             </td>
                             <td className="tw-px-3 tw-py-3">
-                              <input type="number" value={book.price} onChange={(e) => updateBook(ci, bi, "price", parseFloat(e.target.value) || 0)} min="0" step="0.01"
+                              <input type="number" value={book.price || ""} onChange={(e) => updateBook(ci, bi, "price", parseFloat(e.target.value) || 0)} min="0" step="0.01"
                                 className="tw-w-20 tw-px-3 tw-py-2 tw-border tw-border-slate-200 tw-rounded-lg tw-text-sm tw-outline-none focus:tw-border-amber-500" />
                             </td>
                             <td className="tw-px-3 tw-py-3 tw-text-center">
