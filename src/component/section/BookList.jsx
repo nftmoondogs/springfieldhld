@@ -1,10 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getBookData, getClassTotal } from "../../data/bookData";
 import "../../assets/css/bookList.css";
 
 const BookList = () => {
-  const [bookData] = useState(() => getBookData());
+  const [bookData, setBookData] = useState(() => getBookData());
   const [previewImage, setPreviewImage] = useState(null);
+
+  // Re-read from localStorage every time the component mounts or window gains focus
+  const refreshData = useCallback(() => {
+    setBookData(getBookData());
+  }, []);
+
+  useEffect(() => {
+    refreshData();
+    window.addEventListener("focus", refreshData);
+    window.addEventListener("storage", refreshData);
+    return () => {
+      window.removeEventListener("focus", refreshData);
+      window.removeEventListener("storage", refreshData);
+    };
+  }, [refreshData]);
 
   return (
     <div className="book-list-section padding-tb">
