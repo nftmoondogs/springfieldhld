@@ -1,10 +1,11 @@
-import { Fragment, useState, useRef, useCallback } from "react";
+import { Fragment, useState, useRef, useCallback, useEffect } from "react";
 import Header from "../component/layout/header";
 import PageHeader from "../component/layout/pageheader";
 import Footer from "../component/layout/footer";
 import {
   getBookData,
   saveBookData,
+  uploadBookImage,
   getClassTotal,
   generateBookId,
   generateClassId,
@@ -19,9 +20,25 @@ const AdminPage = () => {
   );
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [bookData, setBookData] = useState(() => getBookData());
+  const [bookData, setBookData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
   const fileInputRefs = useRef({});
+
+  // Load data from Firestore on mount
+  useEffect(() => {
+    if (authenticated) {
+      const fetchData = async () => {
+        setLoading(true);
+        const data = await getBookData();
+        setBookData(data);
+        setLoading(false);
+      };
+      fetchData();
+    }
+  }, [authenticated]);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -40,10 +57,21 @@ const AdminPage = () => {
     setPassword("");
   };
 
-  const handleSave = () => {
-    saveBookData(bookData);
+  const showToastMsg = (msg) => {
+    setToastMessage(msg);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2500);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const success = await saveBookData(bookData);
+    setSaving(false);
+    if (success) {
+      showToastMsg("✅ Changes saved successfully!");
+    } else {
+      showToastMsg("❌ Error saving. Please try again.");
+    }
   };
 
   const updateSchoolName = (value) => {
@@ -122,18 +150,31 @@ const AdminPage = () => {
     });
   };
 
-  const handleImageUpload = useCallback((classIndex, bookIndex, field, file) => {
+  const handleImageUpload = useCallback(async (classIndex, bookIndex, field, file) => {
     if (!file) return;
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Image must be under 2MB");
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image must be under 5MB");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      updateBook(classIndex, bookIndex, field, e.target.result);
-    };
-    reader.readAsDataURL(file);
+
+    // Show uploading state
+    updateBook(classIndex, bookIndex, field, "uploading...");
+
+    // Get class ID for storage path
+    setBookData((prev) => {
+      const cls = prev.classes[classIndex];
+      const book = cls.books[bookIndex];
+      // Upload to Firebase Storage
+      uploadBookImage(file, cls.id, book.id, field).then((url) => {
+        if (url) {
+          updateBook(classIndex, bookIndex, field, url);
+        } else {
+          updateBook(classIndex, bookIndex, field, "");
+          alert("Failed to upload image. Please try again.");
+        }
+      });
+      return prev;
+    });
   }, []);
 
   const triggerFileInput = (key) => {
@@ -177,6 +218,25 @@ const AdminPage = () => {
     );
   }
 
+  // Loading state
+  if (loading || !bookData) {
+    return (
+      <Fragment>
+        <Header />
+        <PageHeader title="Admin Panel" curPage="Admin" />
+        <div className="admin-section">
+          <div className="container">
+            <div className="book-list-loading">
+              <div className="book-list-spinner"></div>
+              <p>Loading book data...</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </Fragment>
+    );
+  }
+
   // Admin dashboard
   return (
     <Fragment>
@@ -191,8 +251,12 @@ const AdminPage = () => {
               <button className="admin-btn admin-btn-warning" onClick={addClass}>
                 + Add Class
               </button>
-              <button className="admin-btn admin-btn-success" onClick={handleSave}>
-                💾 Save All Changes
+              <button
+                className="admin-btn admin-btn-success"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? "⏳ Saving..." : "💾 Save All Changes"}
               </button>
               <button className="admin-btn admin-btn-outline" onClick={handleLogout}>
                 Logout
@@ -262,7 +326,7 @@ const AdminPage = () => {
                         {/* Front Image */}
                         <td>
                           <div className="admin-image-cell">
-                            {book.frontImage && (
+                            {book.frontImage && book.frontImage !== "uploading..." && (
                               <>
                                 <img
                                   src={book.frontImage}
@@ -278,6 +342,9 @@ const AdminPage = () => {
                                   ✕ Remove
                                 </button>
                               </>
+                            )}
+                            {book.frontImage === "uploading..." && (
+                              <div className="admin-image-uploading">⏳ Uploading...</div>
                             )}
                             <input
                               type="file"
@@ -308,7 +375,7 @@ const AdminPage = () => {
                         {/* Back Image */}
                         <td>
                           <div className="admin-image-cell">
-                            {book.backImage && (
+                            {book.backImage && book.backImage !== "uploading..." && (
                               <>
                                 <img
                                   src={book.backImage}
@@ -324,6 +391,9 @@ const AdminPage = () => {
                                   ✕ Remove
                                 </button>
                               </>
+                            )}
+                            {book.backImage === "uploading..." && (
+                              <div className="admin-image-uploading">⏳ Uploading...</div>
                             )}
                             <input
                               type="file"
@@ -413,8 +483,13 @@ const AdminPage = () => {
 
           {/* Bottom Save */}
           <div style={{ textAlign: "center", marginTop: 20 }}>
-            <button className="admin-btn admin-btn-success" onClick={handleSave} style={{ padding: "14px 40px", fontSize: 16 }}>
-              💾 Save All Changes
+            <button
+              className="admin-btn admin-btn-success"
+              onClick={handleSave}
+              disabled={saving}
+              style={{ padding: "14px 40px", fontSize: 16 }}
+            >
+              {saving ? "⏳ Saving..." : "💾 Save All Changes"}
             </button>
           </div>
         </div>
@@ -422,7 +497,7 @@ const AdminPage = () => {
 
       {/* Save Toast */}
       {showToast && (
-        <div className="admin-save-toast">✅ Changes saved successfully!</div>
+        <div className="admin-save-toast">{toastMessage}</div>
       )}
 
       <Footer />

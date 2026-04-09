@@ -1,4 +1,14 @@
-const STORAGE_KEY = "springfield_book_data";
+import { db, storage } from "../firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
+
+const DOC_ID = "main";
+const COLLECTION = "bookData";
 
 const getDefaultBookData = () => ({
   schoolName: "SPRING FIELD SCHOOL",
@@ -37,28 +47,58 @@ const getDefaultBookData = () => ({
   ],
 });
 
-export const getBookData = () => {
+// Fetch book data from Firestore
+export const getBookData = async () => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
+    const docRef = doc(db, COLLECTION, DOC_ID);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data();
     }
   } catch (e) {
-    console.error("Error reading book data:", e);
+    console.error("Error reading book data from Firestore:", e);
   }
   // Return default and save it
   const defaultData = getDefaultBookData();
-  saveBookData(defaultData);
+  await saveBookData(defaultData);
   return defaultData;
 };
 
-export const saveBookData = (data) => {
+// Save book data to Firestore
+export const saveBookData = async (data) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    const docRef = doc(db, COLLECTION, DOC_ID);
+    await setDoc(docRef, data);
     return true;
   } catch (e) {
-    console.error("Error saving book data:", e);
+    console.error("Error saving book data to Firestore:", e);
     return false;
+  }
+};
+
+// Upload image to Firebase Storage, returns download URL
+export const uploadBookImage = async (file, classId, bookId, imageType) => {
+  try {
+    const path = `book-images/${classId}/${bookId}_${imageType}_${Date.now()}`;
+    const storageRef = ref(storage, path);
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  } catch (e) {
+    console.error("Error uploading image:", e);
+    return null;
+  }
+};
+
+// Delete image from Firebase Storage
+export const deleteBookImage = async (imageUrl) => {
+  if (!imageUrl || !imageUrl.includes("firebase")) return;
+  try {
+    const imageRef = ref(storage, imageUrl);
+    await deleteObject(imageRef);
+  } catch (e) {
+    // Image might already be deleted, ignore
+    console.warn("Could not delete image:", e);
   }
 };
 

@@ -1,25 +1,34 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { getBookData, getClassTotal } from "../../data/bookData";
 import "../../assets/css/bookList.css";
 
 const BookList = () => {
-  const [bookData, setBookData] = useState(() => getBookData());
+  const [bookData, setBookData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
 
-  // Re-read from localStorage every time the component mounts or window gains focus
-  const refreshData = useCallback(() => {
-    setBookData(getBookData());
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const data = await getBookData();
+      setBookData(data);
+      setLoading(false);
+    };
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    refreshData();
-    window.addEventListener("focus", refreshData);
-    window.addEventListener("storage", refreshData);
-    return () => {
-      window.removeEventListener("focus", refreshData);
-      window.removeEventListener("storage", refreshData);
-    };
-  }, [refreshData]);
+  if (loading || !bookData) {
+    return (
+      <div className="book-list-section padding-tb">
+        <div className="container">
+          <div className="book-list-loading">
+            <div className="book-list-spinner"></div>
+            <p>Loading book list...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="book-list-section padding-tb">
