@@ -1,7 +1,8 @@
 import { Fragment, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import AOS from "aos";
+import "aos/dist/aos.css";
 import Footer from "../component/layout/footer";
-import Header from "../component/layout/header";
-import PageHeader from "../component/layout/pageheader";
 import { getFeeData, getFeeYears, migrateFeeData } from "../data/feeData";
 
 const BlogPage = () => {
@@ -9,6 +10,10 @@ const BlogPage = () => {
   const [selectedYear, setSelectedYear] = useState("");
   const [feeData, setFeeData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    AOS.init({ duration: 800, once: true, easing: "ease-out-cubic" });
+  }, []);
 
   useEffect(() => {
     const init = async () => {
@@ -24,50 +29,177 @@ const BlogPage = () => {
 
   useEffect(() => {
     if (!selectedYear) return;
-    const fetch = async () => {
+    const fetchData = async () => {
       setLoading(true);
       const data = await getFeeData(selectedYear);
       setFeeData(data);
       setLoading(false);
     };
-    fetch();
+    fetchData();
   }, [selectedYear]);
 
   return (
     <Fragment>
-      <Header />
-      <PageHeader title={"Fee Structure"} curPage={"Fee Structure"} />
+      {/* Page Header */}
+      <section
+        style={{
+          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+          padding: "40px 0 60px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "-60px",
+            right: "-60px",
+            width: "300px",
+            height: "300px",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: "-40px",
+            left: "-40px",
+            width: "200px",
+            height: "200px",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)",
+          }}
+        />
+        <div className="container" style={{ position: "relative", zIndex: 1 }}>
+          {/* Back button */}
+          <div style={{ marginBottom: "24px" }}>
+            <Link
+              to="/"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 18px",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "10px",
+                color: "#e2e8f0",
+                fontSize: "13px",
+                fontWeight: 600,
+                textDecoration: "none",
+                transition: "all 0.2s ease",
+                backdropFilter: "blur(4px)",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.15)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+            >
+              <i className="icofont-arrow-left" style={{ fontSize: "14px" }}></i>
+              Back to Home
+            </Link>
+          </div>
 
-      <div className="tw-bg-gradient-to-br tw-from-slate-50 tw-to-slate-100 tw-py-8 sm:tw-py-12 tw-px-3 sm:tw-px-6 lg:tw-px-8">
-        <div className="tw-max-w-7xl tw-mx-auto">
+          <div data-aos="fade-up" style={{ textAlign: "center" }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "6px 16px",
+                background: "rgba(245,158,11,0.15)",
+                border: "1px solid rgba(245,158,11,0.25)",
+                borderRadius: "100px",
+                marginBottom: "16px",
+              }}
+            >
+              <i className="icofont-rupee" style={{ fontSize: "14px", color: "#fbbf24" }}></i>
+              <span
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  color: "#fbbf24",
+                  textTransform: "uppercase",
+                  letterSpacing: "1.5px",
+                }}
+              >
+                Fee Details
+              </span>
+            </div>
+            <h1
+              style={{
+                fontSize: "clamp(28px, 5vw, 44px)",
+                fontWeight: 800,
+                color: "#fff",
+                letterSpacing: "-0.02em",
+                marginBottom: "12px",
+              }}
+            >
+              Fee Structure
+            </h1>
+            <p
+              style={{
+                color: "#94a3b8",
+                fontSize: "16px",
+                maxWidth: "500px",
+                margin: "0 auto",
+                lineHeight: 1.6,
+              }}
+            >
+              Transparent and affordable fee structure for all classes
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Fee Content */}
+      <div style={{ background: "#f8fafc", padding: "40px 0 60px" }}>
+        <div className="container">
           {loading && years.length === 0 ? (
-            <div className="tw-flex tw-items-center tw-justify-center tw-py-20">
-              <div className="tw-w-12 tw-h-12 tw-border-4 tw-border-slate-200 tw-border-t-amber-500 tw-rounded-full tw-animate-spin"></div>
+            <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
+              <div style={{ width: 48, height: 48, border: "4px solid #e2e8f0", borderTopColor: "#f59e0b", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
             </div>
           ) : years.length === 0 ? (
-            <div className="tw-text-center tw-py-20">
-              <p className="tw-text-slate-400 tw-text-lg">Fee structure not available yet.</p>
+            <div style={{ textAlign: "center", padding: "80px 0" }}>
+              <div style={{ width: 64, height: 64, background: "#f1f5f9", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <i className="icofont-rupee" style={{ fontSize: "28px", color: "#94a3b8" }}></i>
+              </div>
+              <p style={{ color: "#94a3b8", fontSize: "16px", fontWeight: 500 }}>Fee structure not available yet.</p>
             </div>
           ) : (
             <>
-              {/* Header */}
-              <div className="tw-text-center tw-mb-6 sm:tw-mb-8">
-                <h2 className="tw-text-2xl sm:tw-text-3xl md:tw-text-4xl tw-font-extrabold tw-text-slate-800 tw-tracking-tight">
-                  {feeData?.schoolName || "SPRING FIELD SCHOOL"}
-                </h2>
-
-                {/* Year Tabs */}
-                <div className="tw-mt-4 sm:tw-mt-5 tw-flex tw-flex-wrap tw-items-center tw-justify-center tw-gap-2">
+              {/* Year Selector */}
+              <div data-aos="fade-up" style={{ textAlign: "center", marginBottom: "40px" }}>
+                <p style={{ fontSize: "13px", fontWeight: 600, color: "#64748b", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "1px" }}>
+                  Select Academic Year
+                </p>
+                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "8px" }}>
                   {years.map((year) => (
                     <button
                       key={year}
                       onClick={() => setSelectedYear(year)}
-                      className={`tw-px-4 sm:tw-px-5 tw-py-2 tw-rounded-full tw-font-bold tw-text-xs sm:tw-text-sm tw-transition-all tw-duration-200 tw-border-2 ${
-                        selectedYear === year
-                          ? "tw-bg-amber-500 tw-text-white tw-border-amber-500 tw-shadow-lg tw-shadow-amber-500/25"
-                          : "tw-bg-white tw-text-slate-600 tw-border-slate-200 hover:tw-border-amber-400 hover:tw-text-amber-600"
-                      }`}
+                      style={{
+                        padding: "10px 24px",
+                        borderRadius: "12px",
+                        fontWeight: 700,
+                        fontSize: "14px",
+                        border: "2px solid",
+                        cursor: "pointer",
+                        transition: "all 0.3s ease",
+                        ...(selectedYear === year
+                          ? {
+                              background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                              color: "#fff",
+                              borderColor: "#f59e0b",
+                              boxShadow: "0 8px 20px rgba(245,158,11,0.3)",
+                            }
+                          : {
+                              background: "#fff",
+                              color: "#475569",
+                              borderColor: "#e2e8f0",
+                            }),
+                      }}
                     >
+                      <i className="icofont-calendar" style={{ marginRight: "6px" }}></i>
                       {year}
                     </button>
                   ))}
@@ -75,49 +207,136 @@ const BlogPage = () => {
               </div>
 
               {loading ? (
-                <div className="tw-flex tw-items-center tw-justify-center tw-py-20">
-                  <div className="tw-w-10 tw-h-10 tw-border-4 tw-border-slate-200 tw-border-t-amber-500 tw-rounded-full tw-animate-spin"></div>
+                <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
+                  <div style={{ width: 40, height: 40, border: "4px solid #e2e8f0", borderTopColor: "#f59e0b", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                 </div>
               ) : !feeData ? (
-                <div className="tw-text-center tw-py-20">
-                  <p className="tw-text-slate-400 tw-text-lg">No data for {selectedYear}</p>
+                <div style={{ textAlign: "center", padding: "80px 0" }}>
+                  <p style={{ color: "#94a3b8", fontSize: "16px" }}>No data for {selectedYear}</p>
                 </div>
               ) : (
                 <>
                   {/* Desktop Table */}
-                  <div className="tw-hidden md:tw-block tw-bg-white tw-rounded-2xl tw-shadow-lg tw-shadow-slate-200/50 tw-border tw-border-slate-200/60 tw-overflow-hidden">
-                    <div className="tw-overflow-x-auto">
-                      <table className="tw-w-full tw-text-sm">
+                  <div
+                    data-aos="fade-up"
+                    className="d-none d-md-block"
+                    style={{
+                      background: "#fff",
+                      borderRadius: "20px",
+                      overflow: "hidden",
+                      border: "1px solid #e2e8f0",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
+                    }}
+                  >
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
-                          <tr className="tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900">
-                            <th className="tw-px-5 tw-py-4 tw-text-left tw-text-xs tw-font-bold tw-text-amber-400 tw-uppercase tw-tracking-widest tw-border-r tw-border-white/10 tw-min-w-[180px] tw-sticky tw-left-0 tw-bg-slate-800 tw-z-10">
+                          <tr style={{ background: "linear-gradient(135deg, #0f172a, #1e293b)" }}>
+                            <th
+                              style={{
+                                padding: "16px 20px",
+                                fontSize: "11px",
+                                fontWeight: 700,
+                                color: "#fbbf24",
+                                textTransform: "uppercase",
+                                letterSpacing: "1.5px",
+                                textAlign: "left",
+                                borderRight: "1px solid rgba(255,255,255,0.08)",
+                                minWidth: "180px",
+                              }}
+                            >
                               Fee Category
                             </th>
                             {feeData.classes.map((cls, i) => (
-                              <th key={i} className="tw-px-4 tw-py-4 tw-text-center tw-text-xs tw-font-bold tw-text-white tw-uppercase tw-tracking-wider tw-border-r tw-border-white/10 last:tw-border-r-0 tw-min-w-[90px]">
+                              <th
+                                key={i}
+                                style={{
+                                  padding: "16px 12px",
+                                  fontSize: "11px",
+                                  fontWeight: 700,
+                                  color: "#fff",
+                                  textTransform: "uppercase",
+                                  letterSpacing: "1px",
+                                  textAlign: "center",
+                                  borderRight: i < feeData.classes.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none",
+                                  minWidth: "90px",
+                                }}
+                              >
                                 {cls}
                               </th>
                             ))}
                           </tr>
                         </thead>
-                        <tbody className="tw-divide-y tw-divide-slate-100">
+                        <tbody>
                           {feeData.feeCategories.map((cat, rowIdx) => (
-                            <tr key={cat.id} className={`${rowIdx % 2 === 0 ? "tw-bg-white" : "tw-bg-slate-50/60"} hover:tw-bg-amber-50/40 tw-transition-colors`}>
-                              <td className="tw-px-5 tw-py-4 tw-font-semibold tw-text-slate-700 tw-text-sm tw-border-r tw-border-slate-100 tw-sticky tw-left-0 tw-bg-inherit tw-z-10">
+                            <tr
+                              key={cat.id}
+                              style={{
+                                background: rowIdx % 2 === 0 ? "#fff" : "#f8fafc",
+                                borderBottom: "1px solid #f1f5f9",
+                                transition: "background 0.2s",
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = "#fffbeb"; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = rowIdx % 2 === 0 ? "#fff" : "#f8fafc"; }}
+                            >
+                              <td
+                                style={{
+                                  padding: "14px 20px",
+                                  fontSize: "13px",
+                                  fontWeight: 600,
+                                  color: "#334155",
+                                  borderRight: "1px solid #f1f5f9",
+                                }}
+                              >
                                 {cat.name}
                               </td>
                               {feeData.classes.map((cls, colIdx) => (
-                                <td key={colIdx} className="tw-px-4 tw-py-4 tw-text-center tw-font-bold tw-text-slate-800 tw-text-sm tw-border-r tw-border-slate-100 last:tw-border-r-0">
-                                  {cat.fees[cls] ? <span>₹{parseFloat(cat.fees[cls]).toLocaleString("en-IN")}</span> : <span className="tw-text-slate-300">—</span>}
+                                <td
+                                  key={colIdx}
+                                  style={{
+                                    padding: "14px 12px",
+                                    textAlign: "center",
+                                    fontWeight: 700,
+                                    fontSize: "14px",
+                                    color: cat.fees[cls] ? "#0f172a" : "#d1d5db",
+                                    borderRight: colIdx < feeData.classes.length - 1 ? "1px solid #f1f5f9" : "none",
+                                  }}
+                                >
+                                  {cat.fees[cls] ? `₹${parseFloat(cat.fees[cls]).toLocaleString("en-IN")}` : "—"}
                                 </td>
                               ))}
                             </tr>
                           ))}
-                          <tr className="tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900">
-                            <td className="tw-px-5 tw-py-4 tw-font-extrabold tw-text-white tw-text-sm tw-uppercase tw-tracking-[2px] tw-sticky tw-left-0 tw-bg-slate-800 tw-z-10">Total</td>
+                          {/* Total row */}
+                          <tr style={{ background: "linear-gradient(135deg, #0f172a, #1e293b)" }}>
+                            <td
+                              style={{
+                                padding: "16px 20px",
+                                fontSize: "13px",
+                                fontWeight: 800,
+                                color: "#fff",
+                                textTransform: "uppercase",
+                                letterSpacing: "2px",
+                              }}
+                            >
+                              Total
+                            </td>
                             {feeData.classes.map((cls, i) => {
                               const total = feeData.feeCategories.reduce((s, c) => s + (parseFloat(c.fees[cls]) || 0), 0);
-                              return <td key={i} className="tw-px-4 tw-py-4 tw-text-center tw-font-extrabold tw-text-amber-400 tw-text-base">{total > 0 ? `₹${total.toLocaleString("en-IN")}` : "—"}</td>;
+                              return (
+                                <td
+                                  key={i}
+                                  style={{
+                                    padding: "16px 12px",
+                                    textAlign: "center",
+                                    fontSize: "17px",
+                                    fontWeight: 800,
+                                    color: "#fbbf24",
+                                  }}
+                                >
+                                  {total > 0 ? `₹${total.toLocaleString("en-IN")}` : "—"}
+                                </td>
+                              );
                             })}
                           </tr>
                         </tbody>
@@ -126,38 +345,122 @@ const BlogPage = () => {
                   </div>
 
                   {/* Mobile Cards */}
-                  <div className="md:tw-hidden tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-                    {feeData.classes.map((cls, i) => {
-                      const total = feeData.feeCategories.reduce((s, c) => s + (parseFloat(c.fees[cls]) || 0), 0);
-                      if (total === 0) return null;
-                      return (
-                        <div key={i} className="tw-bg-white tw-rounded-xl tw-shadow-md tw-border tw-border-slate-200/60 tw-overflow-hidden">
-                          <div className="tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-px-4 tw-py-3 tw-text-center">
-                            <h3 className="tw-text-amber-400 tw-text-lg tw-font-extrabold tw-tracking-widest">{cls}</h3>
-                          </div>
-                          <div className="tw-p-4">
-                            {feeData.feeCategories.map((cat) =>
-                              cat.fees[cls] ? (
-                                <div key={cat.id} className="tw-flex tw-items-center tw-justify-between tw-py-2 tw-border-b tw-border-slate-100 last:tw-border-b-0">
-                                  <span className="tw-text-xs tw-text-slate-500 tw-font-medium">{cat.name}</span>
-                                  <span className="tw-font-bold tw-text-slate-800 tw-text-sm">₹{parseFloat(cat.fees[cls]).toLocaleString("en-IN")}</span>
+                  <div className="d-md-none">
+                    <div className="row g-3">
+                      {feeData.classes.map((cls, i) => {
+                        const total = feeData.feeCategories.reduce((s, c) => s + (parseFloat(c.fees[cls]) || 0), 0);
+                        if (total === 0) return null;
+                        return (
+                          <div className="col-sm-6" key={i}>
+                            <div
+                              data-aos="fade-up"
+                              data-aos-delay={i * 80}
+                              style={{
+                                background: "#fff",
+                                borderRadius: "20px",
+                                overflow: "hidden",
+                                border: "1px solid #e2e8f0",
+                                boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
+                              }}
+                            >
+                              {/* Card header */}
+                              <div
+                                style={{
+                                  background: "linear-gradient(135deg, #0f172a, #1e293b)",
+                                  padding: "16px 20px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                  <div
+                                    style={{
+                                      width: "36px",
+                                      height: "36px",
+                                      background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                                      borderRadius: "10px",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                    }}
+                                  >
+                                    <i className="icofont-graduate-alt" style={{ fontSize: "16px", color: "#fff" }}></i>
+                                  </div>
+                                  <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#fff", margin: 0, letterSpacing: "0.5px" }}>
+                                    {cls}
+                                  </h3>
                                 </div>
-                              ) : null
-                            )}
-                            <div className="tw-flex tw-items-center tw-justify-between tw-pt-3 tw-mt-2 tw-border-t-2 tw-border-slate-200">
-                              <span className="tw-text-xs tw-font-extrabold tw-text-slate-700 tw-uppercase tw-tracking-wider">Total</span>
-                              <span className="tw-font-extrabold tw-text-amber-500 tw-text-lg">₹{total.toLocaleString("en-IN")}</span>
+                                <div style={{ textAlign: "right" }}>
+                                  <p style={{ fontSize: "9px", color: "#94a3b8", margin: 0, textTransform: "uppercase", letterSpacing: "1px" }}>Total</p>
+                                  <p style={{ fontSize: "16px", fontWeight: 800, color: "#fbbf24", margin: 0 }}>₹{total.toLocaleString("en-IN")}</p>
+                                </div>
+                              </div>
+
+                              {/* Fee items */}
+                              <div style={{ padding: "12px 16px" }}>
+                                {feeData.feeCategories.map((cat) =>
+                                  cat.fees[cls] ? (
+                                    <div
+                                      key={cat.id}
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        padding: "10px 4px",
+                                        borderBottom: "1px solid #f1f5f9",
+                                      }}
+                                    >
+                                      <span style={{ fontSize: "12px", color: "#64748b", fontWeight: 500 }}>{cat.name}</span>
+                                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
+                                        ₹{parseFloat(cat.fees[cls]).toLocaleString("en-IN")}
+                                      </span>
+                                    </div>
+                                  ) : null
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
 
+                  {/* Notes */}
                   {feeData.notes && (
-                    <div className="tw-mt-6 tw-bg-amber-50 tw-border tw-border-amber-200 tw-rounded-xl tw-p-4 sm:tw-p-6">
-                      <h4 className="tw-font-bold tw-text-amber-800 tw-text-sm tw-mb-2">Notes</h4>
-                      <p className="tw-text-amber-700 tw-text-sm tw-whitespace-pre-line">{feeData.notes}</p>
+                    <div
+                      data-aos="fade-up"
+                      style={{
+                        marginTop: "32px",
+                        background: "#fffbeb",
+                        border: "1px solid #fde68a",
+                        borderRadius: "16px",
+                        padding: "24px",
+                        display: "flex",
+                        gap: "16px",
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          background: "#fef3c7",
+                          borderRadius: "10px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <i className="icofont-info-circle" style={{ fontSize: "18px", color: "#d97706" }}></i>
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: "14px", fontWeight: 700, color: "#92400e", marginBottom: "6px" }}>Notes</h4>
+                        <p style={{ fontSize: "14px", color: "#a16207", lineHeight: 1.7, margin: 0, whiteSpace: "pre-line" }}>
+                          {feeData.notes}
+                        </p>
+                      </div>
                     </div>
                   )}
                 </>
@@ -168,6 +471,12 @@ const BlogPage = () => {
       </div>
 
       <Footer />
+
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </Fragment>
   );
 };
