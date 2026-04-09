@@ -1,7 +1,7 @@
 import { Fragment, useEffect } from "react";
+import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import Header from "../component/layout/header";
 import Footer from "../component/layout/footer";
 import BookList from "../component/section/BookList";
 
@@ -16,7 +16,7 @@ const AboutPage = () => {
       <section
         style={{
           background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-          padding: "60px 0",
+          padding: "40px 0 60px",
           position: "relative",
           overflow: "hidden",
         }}
@@ -45,6 +45,37 @@ const AboutPage = () => {
           }}
         />
         <div className="container" style={{ position: "relative", zIndex: 1 }}>
+          {/* Back button */}
+          <div style={{ marginBottom: "24px" }}>
+            <Link
+              to="/"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 18px",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "10px",
+                color: "#e2e8f0",
+                fontSize: "13px",
+                fontWeight: 600,
+                textDecoration: "none",
+                transition: "all 0.2s ease",
+                backdropFilter: "blur(4px)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+              }}
+            >
+              <i className="icofont-arrow-left" style={{ fontSize: "14px" }}></i>
+              Back to Home
+            </Link>
+          </div>
+
           <div data-aos="fade-up" style={{ textAlign: "center" }}>
             <div
               style={{
@@ -93,35 +124,6 @@ const AboutPage = () => {
             >
               Complete book lists for all classes with pricing details
             </p>
-            {/* Breadcrumb */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                marginTop: "20px",
-              }}
-            >
-              <a
-                href="/"
-                style={{
-                  color: "#94a3b8",
-                  fontSize: "13px",
-                  textDecoration: "none",
-                  fontWeight: 500,
-                }}
-              >
-                Home
-              </a>
-              <i
-                className="icofont-arrow-right"
-                style={{ fontSize: "10px", color: "#475569" }}
-              ></i>
-              <span style={{ color: "#f59e0b", fontSize: "13px", fontWeight: 600 }}>
-                Book Lists
-              </span>
-            </div>
           </div>
         </div>
       </section>
