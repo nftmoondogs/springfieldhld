@@ -1,11 +1,5 @@
-import { db, storage } from "../firebase";
+import { db } from "../firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
 
 const DOC_ID = "main";
 const COLLECTION = "bookData";
@@ -64,7 +58,7 @@ export const getBookData = async () => {
   return defaultData;
 };
 
-// Save book data to Firestore
+// Save book data to Firestore (images stored as base64 strings)
 export const saveBookData = async (data) => {
   try {
     const docRef = doc(db, COLLECTION, DOC_ID);
@@ -76,30 +70,14 @@ export const saveBookData = async (data) => {
   }
 };
 
-// Upload image to Firebase Storage, returns download URL
-export const uploadBookImage = async (file, classId, bookId, imageType) => {
-  try {
-    const path = `book-images/${classId}/${bookId}_${imageType}_${Date.now()}`;
-    const storageRef = ref(storage, path);
-    await uploadBytes(storageRef, file);
-    const downloadURL = await getDownloadURL(storageRef);
-    return downloadURL;
-  } catch (e) {
-    console.error("Error uploading image:", e);
-    return null;
-  }
-};
-
-// Delete image from Firebase Storage
-export const deleteBookImage = async (imageUrl) => {
-  if (!imageUrl || !imageUrl.includes("firebase")) return;
-  try {
-    const imageRef = ref(storage, imageUrl);
-    await deleteObject(imageRef);
-  } catch (e) {
-    // Image might already be deleted, ignore
-    console.warn("Could not delete image:", e);
-  }
+// Convert file to base64 string (for image storage in Firestore)
+export const fileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 };
 
 export const getClassTotal = (books) => {

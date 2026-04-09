@@ -5,7 +5,7 @@ import Footer from "../component/layout/footer";
 import {
   getBookData,
   saveBookData,
-  uploadBookImage,
+  fileToBase64,
   getClassTotal,
   generateBookId,
   generateClassId,
@@ -152,29 +152,19 @@ const AdminPage = () => {
 
   const handleImageUpload = useCallback(async (classIndex, bookIndex, field, file) => {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Image must be under 5MB");
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image must be under 2MB");
       return;
     }
 
-    // Show uploading state
-    updateBook(classIndex, bookIndex, field, "uploading...");
-
-    // Get class ID for storage path
-    setBookData((prev) => {
-      const cls = prev.classes[classIndex];
-      const book = cls.books[bookIndex];
-      // Upload to Firebase Storage
-      uploadBookImage(file, cls.id, book.id, field).then((url) => {
-        if (url) {
-          updateBook(classIndex, bookIndex, field, url);
-        } else {
-          updateBook(classIndex, bookIndex, field, "");
-          alert("Failed to upload image. Please try again.");
-        }
-      });
-      return prev;
-    });
+    try {
+      // Convert to base64 and store directly in Firestore
+      const base64 = await fileToBase64(file);
+      updateBook(classIndex, bookIndex, field, base64);
+    } catch (err) {
+      console.error("Image conversion error:", err);
+      alert("Failed to process image. Please try again.");
+    }
   }, []);
 
   const triggerFileInput = (key) => {
