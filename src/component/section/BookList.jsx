@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { getBookData, getClassTotal } from "../../data/bookData";
-import "../../assets/css/bookList.css";
 
 const BookList = () => {
   const [bookData, setBookData] = useState(null);
@@ -19,90 +18,135 @@ const BookList = () => {
 
   if (loading || !bookData) {
     return (
-      <div className="book-list-section padding-tb">
-        <div className="container">
-          <div className="book-list-loading">
-            <div className="book-list-spinner"></div>
-            <p>Loading book list...</p>
-          </div>
+      <div className="tw-min-h-[60vh] tw-flex tw-items-center tw-justify-center tw-bg-gradient-to-br tw-from-slate-50 tw-to-slate-100">
+        <div className="tw-text-center">
+          <div className="tw-w-12 tw-h-12 tw-border-4 tw-border-slate-200 tw-border-t-amber-500 tw-rounded-full tw-animate-spin tw-mx-auto tw-mb-4"></div>
+          <p className="tw-text-slate-500 tw-font-medium tw-text-lg">Loading book list...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="book-list-section padding-tb">
-      <div className="container">
-        <div className="book-list-header">
-          <h3 className="book-list-school-name">{bookData.schoolName}</h3>
-          <p className="book-list-year">BOOK LIST {bookData.year}</p>
+    <div className="tw-bg-gradient-to-br tw-from-slate-50 tw-to-slate-100 tw-py-12 tw-px-4 sm:tw-px-6 lg:tw-px-8">
+      <div className="tw-max-w-7xl tw-mx-auto">
+        {/* Header */}
+        <div className="tw-text-center tw-mb-10">
+          <h2 className="tw-text-3xl md:tw-text-4xl tw-font-extrabold tw-text-slate-800 tw-tracking-tight">
+            {bookData.schoolName}
+          </h2>
+          <div className="tw-mt-2 tw-inline-flex tw-items-center tw-gap-2 tw-bg-amber-500 tw-text-white tw-px-5 tw-py-1.5 tw-rounded-full tw-text-sm tw-font-bold tw-tracking-wider">
+            📚 BOOK LIST {bookData.year}
+          </div>
         </div>
 
-        <div className="book-list-grid">
+        {/* Classes Grid */}
+        <div className="tw-grid tw-grid-cols-1 lg:tw-grid-cols-2 tw-gap-8">
           {bookData.classes.map((cls) => (
-            <div className="book-class-card" key={cls.id}>
-              <div className="book-class-header">
-                <h4>{bookData.schoolName}</h4>
-                <p>BOOK LIST {bookData.year}</p>
-                <h5>{cls.name}</h5>
+            <div
+              key={cls.id}
+              className="tw-bg-white tw-rounded-2xl tw-shadow-lg tw-shadow-slate-200/50 tw-border tw-border-slate-200/60 tw-overflow-hidden hover:tw-shadow-xl tw-transition-shadow tw-duration-300"
+            >
+              {/* Class Header */}
+              <div className="tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-px-6 tw-py-5 tw-text-center">
+                <p className="tw-text-slate-400 tw-text-xs tw-font-semibold tw-tracking-widest tw-uppercase tw-mb-0.5">
+                  {bookData.schoolName}
+                </p>
+                <p className="tw-text-slate-400 tw-text-xs tw-font-medium tw-mb-1">
+                  BOOK LIST {bookData.year}
+                </p>
+                <h3 className="tw-text-amber-400 tw-text-2xl tw-font-extrabold tw-tracking-widest">
+                  {cls.name}
+                </h3>
               </div>
 
-              <table className="book-table">
-                <thead>
-                  <tr>
-                    <th className="col-num">#</th>
-                    <th className="col-img">Front</th>
-                    <th className="col-img">Back</th>
-                    <th className="col-name">Book Name</th>
-                    <th className="col-price">Price (₹)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cls.books.map((book, idx) => (
-                    <tr key={book.id}>
-                      <td className="col-num">{idx + 1}</td>
-                      <td className="col-img">
-                        {book.frontImage ? (
-                          <img
-                            src={book.frontImage}
-                            alt={`${book.name} front`}
-                            className="book-thumb"
-                            onClick={() => setPreviewImage(book.frontImage)}
-                          />
-                        ) : (
-                          <div className="book-thumb-placeholder">
-                            <i className="icofont-image"></i>
-                          </div>
-                        )}
-                      </td>
-                      <td className="col-img">
-                        {book.backImage ? (
-                          <img
-                            src={book.backImage}
-                            alt={`${book.name} back`}
-                            className="book-thumb"
-                            onClick={() => setPreviewImage(book.backImage)}
-                          />
-                        ) : (
-                          <div className="book-thumb-placeholder">
-                            <i className="icofont-image"></i>
-                          </div>
-                        )}
-                      </td>
-                      <td className="col-name">{book.name}</td>
-                      <td className="col-price">{book.price}</td>
+              {/* Book Table */}
+              <div className="tw-overflow-x-auto">
+                <table className="tw-w-full tw-text-sm">
+                  <thead>
+                    <tr className="tw-bg-slate-50 tw-border-b-2 tw-border-slate-200">
+                      <th className="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider tw-w-12">
+                        #
+                      </th>
+                      <th className="tw-px-3 tw-py-3 tw-text-center tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider tw-w-24">
+                        Front
+                      </th>
+                      <th className="tw-px-3 tw-py-3 tw-text-center tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider tw-w-24">
+                        Back
+                      </th>
+                      <th className="tw-px-4 tw-py-3 tw-text-left tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider">
+                        Book Name
+                      </th>
+                      <th className="tw-px-4 tw-py-3 tw-text-right tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-tracking-wider tw-w-24">
+                        Price (₹)
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr className="total-row">
-                    <td colSpan="4" className="total-label">TOTAL</td>
-                    <td className="total-value">
-                      {getClassTotal(cls.books).toFixed(2)}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
+                  </thead>
+                  <tbody className="tw-divide-y tw-divide-slate-100">
+                    {cls.books.map((book, idx) => (
+                      <tr
+                        key={book.id}
+                        className="hover:tw-bg-amber-50/40 tw-transition-colors tw-duration-150"
+                      >
+                        <td className="tw-px-4 tw-py-3 tw-text-center tw-font-bold tw-text-slate-400 tw-text-sm">
+                          {idx + 1}
+                        </td>
+                        <td className="tw-px-3 tw-py-3 tw-text-center">
+                          {book.frontImage ? (
+                            <img
+                              src={book.frontImage}
+                              alt={`${book.name} front`}
+                              className="tw-w-16 tw-h-20 tw-object-cover tw-rounded-lg tw-border-2 tw-border-slate-200 tw-cursor-pointer hover:tw-scale-110 hover:tw-shadow-lg tw-transition-all tw-duration-200 tw-mx-auto"
+                              onClick={() => setPreviewImage(book.frontImage)}
+                            />
+                          ) : (
+                            <div className="tw-w-16 tw-h-20 tw-bg-slate-100 tw-rounded-lg tw-border-2 tw-border-dashed tw-border-slate-300 tw-flex tw-items-center tw-justify-center tw-mx-auto">
+                              <svg className="tw-w-5 tw-h-5 tw-text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          )}
+                        </td>
+                        <td className="tw-px-3 tw-py-3 tw-text-center">
+                          {book.backImage ? (
+                            <img
+                              src={book.backImage}
+                              alt={`${book.name} back`}
+                              className="tw-w-16 tw-h-20 tw-object-cover tw-rounded-lg tw-border-2 tw-border-slate-200 tw-cursor-pointer hover:tw-scale-110 hover:tw-shadow-lg tw-transition-all tw-duration-200 tw-mx-auto"
+                              onClick={() => setPreviewImage(book.backImage)}
+                            />
+                          ) : (
+                            <div className="tw-w-16 tw-h-20 tw-bg-slate-100 tw-rounded-lg tw-border-2 tw-border-dashed tw-border-slate-300 tw-flex tw-items-center tw-justify-center tw-mx-auto">
+                              <svg className="tw-w-5 tw-h-5 tw-text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          )}
+                        </td>
+                        <td className="tw-px-4 tw-py-3 tw-font-semibold tw-text-slate-700 tw-uppercase tw-tracking-wide tw-text-sm">
+                          {book.name}
+                        </td>
+                        <td className="tw-px-4 tw-py-3 tw-text-right tw-font-bold tw-text-slate-800 tw-text-base">
+                          {book.price}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900">
+                      <td
+                        colSpan="4"
+                        className="tw-px-6 tw-py-4 tw-text-center tw-font-extrabold tw-text-white tw-text-base tw-uppercase tw-tracking-[3px]"
+                      >
+                        TOTAL
+                      </td>
+                      <td className="tw-px-4 tw-py-4 tw-text-right tw-font-extrabold tw-text-amber-400 tw-text-lg">
+                        ₹{getClassTotal(cls.books).toFixed(2)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
             </div>
           ))}
         </div>
@@ -110,12 +154,22 @@ const BookList = () => {
 
       {/* Image Preview Modal */}
       {previewImage && (
-        <div className="image-preview-overlay" onClick={() => setPreviewImage(null)}>
-          <div className="image-preview-container">
-            <button className="image-preview-close" onClick={() => setPreviewImage(null)}>
+        <div
+          className="tw-fixed tw-inset-0 tw-bg-black/85 tw-z-[10000] tw-flex tw-items-center tw-justify-center tw-cursor-pointer tw-animate-fade-in tw-p-4"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="tw-relative tw-max-w-[90vw] tw-max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="tw-absolute tw--top-3 tw--right-3 tw-w-10 tw-h-10 tw-rounded-full tw-bg-white tw-text-slate-800 tw-text-xl tw-font-bold tw-flex tw-items-center tw-justify-center tw-shadow-xl tw-cursor-pointer tw-z-[10001] hover:tw-bg-red-500 hover:tw-text-white tw-transition-colors"
+              onClick={() => setPreviewImage(null)}
+            >
               ✕
             </button>
-            <img src={previewImage} alt="Book preview" />
+            <img
+              src={previewImage}
+              alt="Book preview"
+              className="tw-max-w-[90vw] tw-max-h-[85vh] tw-object-contain tw-rounded-xl tw-shadow-2xl"
+            />
           </div>
         </div>
       )}
