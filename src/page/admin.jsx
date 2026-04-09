@@ -14,7 +14,7 @@ import {
   generateBookId,
   generateClassId,
 } from "../data/bookData";
-import { getFeeData, saveFeeData } from "../data/feeData";
+import { getFeeData, saveFeeData, getFeeYears, createFeeYear, deleteFeeYear, migrateFeeData } from "../data/feeData";
 
 const ADMIN_PASSWORD = "Suzain@1918";
 
@@ -38,6 +38,10 @@ const AdminPage = () => {
   const [feeData, setFeeData] = useState(null);
   const [feeLoading, setFeeLoading] = useState(false);
   const [feeSaving, setFeeSaving] = useState(false);
+  const [feeYears, setFeeYears] = useState([]);
+  const [selectedFeeYear, setSelectedFeeYear] = useState("");
+  const [newFeeYear, setNewFeeYear] = useState("");
+  const [showNewFeeYearInput, setShowNewFeeYearInput] = useState(false);
   const [newClassName, setNewClassName] = useState("");
   const [newCatName, setNewCatName] = useState("");
   const [dragIndex, setDragIndex] = useState(null);
@@ -72,23 +76,65 @@ const AdminPage = () => {
     fetchYears();
   }, [authenticated]);
 
-  // Fetch fee data when tab switches
+  // Fetch fee years when tab switches
   useEffect(() => {
-    if (adminTab !== "fees" || !authenticated || feeData) return;
+    if (adminTab !== "fees" || !authenticated || feeYears.length > 0) return;
+    const init = async () => {
+      setFeeLoading(true);
+      await migrateFeeData();
+      const yrs = await getFeeYears();
+      setFeeYears(yrs);
+      if (yrs.length > 0) setSelectedFeeYear(yrs[0]);
+      setFeeLoading(false);
+    };
+    init();
+  }, [adminTab, authenticated]);
+
+  // Fetch fee data when year changes
+  useEffect(() => {
+    if (!selectedFeeYear || !authenticated) return;
     const fetchFees = async () => {
       setFeeLoading(true);
-      const data = await getFeeData();
+      const data = await getFeeData(selectedFeeYear);
       setFeeData(data);
       setFeeLoading(false);
     };
     fetchFees();
-  }, [adminTab, authenticated]);
+  }, [selectedFeeYear, authenticated]);
 
   const handleSaveFees = async () => {
+    if (!selectedFeeYear || !feeData) return;
     setFeeSaving(true);
-    const success = await saveFeeData(feeData);
+    const success = await saveFeeData(selectedFeeYear, feeData);
     setFeeSaving(false);
     showToastMsg(success ? "✅ Fee structure saved!" : "❌ Error saving.");
+  };
+
+  const handleCreateFeeYear = async () => {
+    const yr = newFeeYear.trim();
+    if (!yr) return;
+    if (feeYears.includes(yr)) { showToastMsg("❌ Year exists."); return; }
+    const success = await createFeeYear(yr, feeData?.schoolName || "SPRING FIELD SCHOOL");
+    if (success) {
+      const updated = [yr, ...feeYears].sort((a, b) => b.localeCompare(a));
+      setFeeYears(updated);
+      setSelectedFeeYear(yr);
+      setNewFeeYear("");
+      setShowNewFeeYearInput(false);
+      showToastMsg("✅ Year created!");
+    }
+  };
+
+  const handleDeleteFeeYear = async () => {
+    if (!selectedFeeYear || !window.confirm(`Delete fee structure for "${selectedFeeYear}"?`)) return;
+    const success = await deleteFeeYear(selectedFeeYear);
+    if (success) {
+      const updated = feeYears.filter((y) => y !== selectedFeeYear);
+      setFeeYears(updated);
+      setSelectedFeeYear(updated.length > 0 ? updated[0] : "");
+      setFeeData(null);
+      showToastMsg("✅ Year deleted.");
+    }
   };
 
   const updateFee = (catIndex, className, value) => {
@@ -582,27 +628,60 @@ const AdminPage = () => {
           {/* Fee Structure Tab */}
           {adminTab === "fees" && (
             <>
+              {/* Fee Year Selector */}
+              <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
+                <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">📅 Fee Structure Year</h4>
+                <div className="tw-flex tw-flex-wrap tw-items-center tw-gap-2">
+                  {feeYears.map((yr) => (
+                    <button key={yr} onClick={() => setSelectedFeeYear(yr)}
+                      className={`tw-px-3 sm:tw-px-5 tw-py-2 tw-rounded-lg tw-font-bold tw-text-xs sm:tw-text-sm tw-transition-all tw-border-2 ${
+                        selectedFeeYear === yr
+                          ? "tw-bg-amber-500 tw-text-white tw-border-amber-500 tw-shadow-lg tw-shadow-amber-500/25"
+                          : "tw-bg-white tw-text-slate-600 tw-border-slate-200 hover:tw-border-amber-400"
+                      }`}>
+                      {yr}
+                    </button>
+                  ))}
+                  {showNewFeeYearInput ? (
+                    <div className="tw-flex tw-items-center tw-gap-2 tw-w-full sm:tw-w-auto tw-mt-1 sm:tw-mt-0">
+                      <input type="text" value={newFeeYear} onChange={(e) => setNewFeeYear(e.target.value)}
+                        placeholder="e.g. 2025-2026" autoFocus onKeyDown={(e) => e.key === "Enter" && handleCreateFeeYear()}
+                        className="tw-flex-1 sm:tw-w-36 tw-px-3 tw-py-2 tw-border-2 tw-border-slate-200 tw-rounded-lg tw-text-sm tw-outline-none focus:tw-border-amber-500" />
+                      <button onClick={handleCreateFeeYear} className="tw-px-3 tw-py-2 tw-bg-emerald-500 tw-text-white tw-rounded-lg tw-font-bold tw-text-xs">Create</button>
+                      <button onClick={() => { setShowNewFeeYearInput(false); setNewFeeYear(""); }} className="tw-px-2 tw-py-2 tw-text-slate-400 tw-text-xs tw-font-bold">Cancel</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setShowNewFeeYearInput(true)}
+                      className="tw-px-3 sm:tw-px-5 tw-py-2 tw-rounded-lg tw-font-bold tw-text-xs sm:tw-text-sm tw-border-2 tw-border-dashed tw-border-slate-300 tw-text-slate-400 hover:tw-border-amber-400 hover:tw-text-amber-600 tw-transition-colors">
+                      + New Year
+                    </button>
+                  )}
+                </div>
+                {selectedFeeYear && (
+                  <button onClick={handleDeleteFeeYear}
+                    className="tw-mt-3 tw-px-3 tw-py-1.5 tw-rounded-lg tw-font-bold tw-text-xs tw-bg-red-50 tw-text-red-500 tw-border tw-border-red-200 hover:tw-bg-red-500 hover:tw-text-white tw-transition-colors">
+                    🗑️ Delete {selectedFeeYear}
+                  </button>
+                )}
+              </div>
+
               {feeLoading ? (
                 <div className="tw-flex tw-items-center tw-justify-center tw-py-20">
                   <div className="tw-w-10 tw-h-10 tw-border-4 tw-border-slate-200 tw-border-t-amber-500 tw-rounded-full tw-animate-spin"></div>
                 </div>
+              ) : !selectedFeeYear ? (
+                <div className="tw-text-center tw-py-20">
+                  <p className="tw-text-slate-400 tw-text-lg tw-font-medium">Create a year to get started.</p>
+                </div>
               ) : feeData ? (
                 <>
-                  {/* Session & School */}
+                  {/* School Name */}
                   <div className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-p-4 sm:tw-p-6 tw-mb-5">
                     <h4 className="tw-text-sm sm:tw-text-base tw-font-bold tw-text-slate-700 tw-mb-3">📋 Fee Details</h4>
-                    <div className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-                      <div>
-                        <label className="tw-block tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-mb-1">School Name</label>
-                        <input type="text" value={feeData.schoolName} onChange={(e) => setFeeData((p) => ({ ...p, schoolName: e.target.value }))}
-                          className="tw-w-full tw-px-3 tw-py-2.5 tw-border-2 tw-border-slate-200 tw-rounded-xl tw-text-sm tw-outline-none focus:tw-border-amber-500" />
-                      </div>
-                      <div>
-                        <label className="tw-block tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-mb-1">Session / Year</label>
-                        <input type="text" value={feeData.session} onChange={(e) => setFeeData((p) => ({ ...p, session: e.target.value }))}
-                          placeholder="e.g. 2026-2027"
-                          className="tw-w-full tw-px-3 tw-py-2.5 tw-border-2 tw-border-slate-200 tw-rounded-xl tw-text-sm tw-outline-none focus:tw-border-amber-500" />
-                      </div>
+                    <div>
+                      <label className="tw-block tw-text-xs tw-font-bold tw-text-slate-500 tw-uppercase tw-mb-1">School Name</label>
+                      <input type="text" value={feeData.schoolName} onChange={(e) => setFeeData((p) => ({ ...p, schoolName: e.target.value }))}
+                        className="tw-w-full sm:tw-w-1/2 tw-px-3 tw-py-2.5 tw-border-2 tw-border-slate-200 tw-rounded-xl tw-text-sm tw-outline-none focus:tw-border-amber-500" />
                     </div>
                   </div>
 

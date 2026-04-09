@@ -1,13 +1,10 @@
 import { db } from "../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs, deleteDoc } from "firebase/firestore";
 
-const FEE_DOC = "feeStructure";
-const FEE_ID = "current";
+const COLLECTION = "feeStructure";
 
-// Default fee structure
 const getDefaultFeeData = () => ({
   schoolName: "SPRING FIELD SCHOOL",
-  session: "2026-2027",
   classes: ["NURSERY", "LKG", "UKG", "I", "II", "III", "IV", "V", "VI", "VII", "VIII"],
   feeCategories: [
     { id: "admission", name: "Admission Fee", fees: {} },
@@ -19,26 +16,85 @@ const getDefaultFeeData = () => ({
   notes: "",
 });
 
-// Fetch fee structure
-export const getFeeData = async () => {
+// Migrate old single-doc format to year-based
+export const migrateFeeData = async () => {
   try {
-    const docRef = doc(db, FEE_DOC, FEE_ID);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) return docSnap.data();
-    return getDefaultFeeData();
+    const oldRef = doc(db, COLLECTION, "current");
+    const oldSnap = await getDoc(oldRef);
+    if (oldSnap.exists()) {
+      const data = oldSnap.data();
+      const year = data.session || "2026-2027";
+      const { session, ...rest } = data;
+      await setDoc(doc(db, COLLECTION, year), rest);
+      await deleteDoc(oldRef);
+      console.log(`Migrated fee data to year: ${year}`);
+    }
   } catch (e) {
-    console.error("Error reading fee data:", e);
-    return getDefaultFeeData();
+    console.error("Fee migration error:", e);
   }
 };
 
-// Save fee structure
-export const saveFeeData = async (data) => {
+// Get all available fee years
+export const getFeeYears = async () => {
   try {
-    await setDoc(doc(db, FEE_DOC, FEE_ID), data);
+    const snapshot = await getDocs(collection(db, COLLECTION));
+    const years = [];
+    snapshot.forEach((d) => years.push(d.id));
+    years.sort((a, b) => b.localeCompare(a));
+    return years;
+  } catch (e) {
+    console.error("Error fetching fee years:", e);
+    return [];
+  }
+};
+
+// Fetch fee data for a specific year
+export const getFeeData = async (year) => {
+  if (!year) return null;
+  try {
+    const docSnap = await getDoc(doc(db, COLLECTION, year));
+    if (docSnap.exists()) return { year, ...docSnap.data() };
+    return null;
+  } catch (e) {
+    console.error("Error reading fee data:", e);
+    return null;
+  }
+};
+
+// Save fee data for a year
+export const saveFeeData = async (year, data) => {
+  try {
+    const { year: _, ...rest } = data;
+    await setDoc(doc(db, COLLECTION, year), rest);
     return true;
   } catch (e) {
     console.error("Error saving fee data:", e);
+    return false;
+  }
+};
+
+// Create a new fee year
+export const createFeeYear = async (year, schoolName = "SPRING FIELD SCHOOL") => {
+  try {
+    const existing = await getDoc(doc(db, COLLECTION, year));
+    if (existing.exists()) return false;
+    const defaults = getDefaultFeeData();
+    defaults.schoolName = schoolName;
+    await setDoc(doc(db, COLLECTION, year), defaults);
+    return true;
+  } catch (e) {
+    console.error("Error creating fee year:", e);
+    return false;
+  }
+};
+
+// Delete a fee year
+export const deleteFeeYear = async (year) => {
+  try {
+    await deleteDoc(doc(db, COLLECTION, year));
+    return true;
+  } catch (e) {
+    console.error("Error deleting fee year:", e);
     return false;
   }
 };
