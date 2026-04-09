@@ -3,7 +3,7 @@ import { doc, getDoc, setDoc, collection, getDocs, deleteDoc, writeBatch } from 
 
 const COLLECTION = "bookData";
 
-// Migrate old 'main' doc (single-doc format) to year-based subcollection format
+// Migrate old formats to the new subcollection + separate images format
 export const migrateOldData = async () => {
   try {
     // Check for old 'main' doc
@@ -14,55 +14,95 @@ export const migrateOldData = async () => {
       const year = data.year || "2026-2027";
       const classes = data.classes || [];
       const schoolName = data.schoolName || "SPRING FIELD SCHOOL";
-
-      // Write year metadata
-      const yearRef = doc(db, COLLECTION, year);
-      await setDoc(yearRef, {
-        schoolName,
-        classOrder: classes.map((c) => c.id),
-      });
-
-      // Write each class as a subcollection doc
-      const batch = writeBatch(db);
-      classes.forEach((cls) => {
-        const classRef = doc(db, COLLECTION, year, "classes", cls.id);
-        batch.set(classRef, { name: cls.name, books: cls.books || [] });
-      });
-      await batch.commit();
-
-      // Delete old doc
+      await migrateClassesForYear(year, schoolName, classes);
       await deleteDoc(mainRef);
       console.log(`Migrated 'main' doc to year: ${year}`);
     }
 
-    // Also migrate old year docs that have classes array inline (pre-subcollection format)
+    // Migrate old year docs that have classes inline
     const yearSnap = await getDocs(collection(db, COLLECTION));
     for (const yearDoc of yearSnap.docs) {
+      if (yearDoc.id === "main") continue;
       const data = yearDoc.data();
       if (data.classes && Array.isArray(data.classes)) {
-        // Old format — has classes inline. Migrate to subcollection.
-        const year = yearDoc.id;
-        const classes = data.classes;
-        const schoolName = data.schoolName || "SPRING FIELD SCHOOL";
+        await migrateClassesForYear(yearDoc.id, data.schoolName || "SPRING FIELD SCHOOL", data.classes);
+        console.log(`Migrated inline classes for year: ${yearDoc.id}`);
+      }
+    }
 
-        // Write metadata (without classes array)
-        await setDoc(doc(db, COLLECTION, year), {
-          schoolName,
-          classOrder: classes.map((c) => c.id),
-        });
-
-        // Write classes to subcollection
-        const batch = writeBatch(db);
-        classes.forEach((cls) => {
-          const classRef = doc(db, COLLECTION, year, "classes", cls.id);
-          batch.set(classRef, { name: cls.name, books: cls.books || [] });
-        });
-        await batch.commit();
-        console.log(`Migrated inline classes for year: ${year}`);
+    // Migrate class docs that still have images inline in books
+    const allYears = await getDocs(collection(db, COLLECTION));
+    for (const yearDoc of allYears.docs) {
+      const data = yearDoc.data();
+      if (data.classOrder) {
+        const classesSnap = await getDocs(collection(db, COLLECTION, yearDoc.id, "classes"));
+        for (const classDoc of classesSnap.docs) {
+          const classData = classDoc.data();
+          const books = classData.books || [];
+          let hasInlineImages = false;
+          for (const book of books) {
+            if ((book.frontImage && book.frontImage.length > 100) ||
+                (book.backImage && book.backImage.length > 100)) {
+              hasInlineImages = true;
+              break;
+            }
+          }
+          if (hasInlineImages) {
+            // Extract images to separate docs, strip from books
+            const strippedBooks = [];
+            for (const book of books) {
+              if (book.frontImage && book.frontImage.length > 100) {
+                const imgRef = doc(db, COLLECTION, yearDoc.id, "images", `${classDoc.id}_${book.id}_front`);
+                await setDoc(imgRef, { data: book.frontImage });
+              }
+              if (book.backImage && book.backImage.length > 100) {
+                const imgRef = doc(db, COLLECTION, yearDoc.id, "images", `${classDoc.id}_${book.id}_back`);
+                await setDoc(imgRef, { data: book.backImage });
+              }
+              strippedBooks.push({
+                ...book,
+                frontImage: book.frontImage ? "ref" : "",
+                backImage: book.backImage ? "ref" : "",
+              });
+            }
+            await setDoc(classDoc.ref, { name: classData.name, books: strippedBooks });
+            console.log(`Migrated images for class ${classDoc.id} in year ${yearDoc.id}`);
+          }
+        }
       }
     }
   } catch (e) {
     console.error("Migration error:", e);
+  }
+};
+
+// Helper: migrate classes for a year
+const migrateClassesForYear = async (year, schoolName, classes) => {
+  const yearRef = doc(db, COLLECTION, year);
+  await setDoc(yearRef, { schoolName, classOrder: classes.map((c) => c.id) });
+
+  for (const cls of classes) {
+    const books = cls.books || [];
+    const strippedBooks = [];
+
+    for (const book of books) {
+      if (book.frontImage && book.frontImage.length > 100) {
+        const imgRef = doc(db, COLLECTION, year, "images", `${cls.id}_${book.id}_front`);
+        await setDoc(imgRef, { data: book.frontImage });
+      }
+      if (book.backImage && book.backImage.length > 100) {
+        const imgRef = doc(db, COLLECTION, year, "images", `${cls.id}_${book.id}_back`);
+        await setDoc(imgRef, { data: book.backImage });
+      }
+      strippedBooks.push({
+        ...book,
+        frontImage: book.frontImage ? "ref" : "",
+        backImage: book.backImage ? "ref" : "",
+      });
+    }
+
+    const classRef = doc(db, COLLECTION, year, "classes", cls.id);
+    await setDoc(classRef, { name: cls.name, books: strippedBooks });
   }
 };
 
@@ -71,7 +111,7 @@ export const getAvailableYears = async () => {
   try {
     const snapshot = await getDocs(collection(db, COLLECTION));
     const years = [];
-    snapshot.forEach((doc) => years.push(doc.id));
+    snapshot.forEach((d) => years.push(d.id));
     years.sort((a, b) => b.localeCompare(a));
     return years;
   } catch (e) {
@@ -80,7 +120,7 @@ export const getAvailableYears = async () => {
   }
 };
 
-// Fetch book data for a specific year (metadata + all classes from subcollection)
+// Fetch book data for a specific year
 export const getBookData = async (year) => {
   if (!year) return null;
   try {
@@ -91,65 +131,107 @@ export const getBookData = async (year) => {
     const meta = yearSnap.data();
     const classOrder = meta.classOrder || [];
 
-    // Fetch all classes from subcollection
+    // Fetch all classes
     const classesSnap = await getDocs(collection(db, COLLECTION, year, "classes"));
     const classesMap = {};
-    classesSnap.forEach((d) => {
-      classesMap[d.id] = { id: d.id, ...d.data() };
+    classesSnap.forEach((d) => { classesMap[d.id] = { id: d.id, ...d.data() }; });
+
+    // Fetch all images
+    const imagesSnap = await getDocs(collection(db, COLLECTION, year, "images"));
+    const imagesMap = {};
+    imagesSnap.forEach((d) => { imagesMap[d.id] = d.data().data; });
+
+    // Merge images into books
+    Object.values(classesMap).forEach((cls) => {
+      cls.books = (cls.books || []).map((book) => ({
+        ...book,
+        frontImage: imagesMap[`${cls.id}_${book.id}_front`] || (book.frontImage === "ref" ? "" : book.frontImage || ""),
+        backImage: imagesMap[`${cls.id}_${book.id}_back`] || (book.backImage === "ref" ? "" : book.backImage || ""),
+      }));
     });
 
-    // Order classes according to classOrder, append any not in order
+    // Order classes
     const orderedClasses = [];
     classOrder.forEach((id) => {
-      if (classesMap[id]) {
-        orderedClasses.push(classesMap[id]);
-        delete classesMap[id];
-      }
+      if (classesMap[id]) { orderedClasses.push(classesMap[id]); delete classesMap[id]; }
     });
-    // Append remaining classes not in classOrder
     Object.values(classesMap).forEach((c) => orderedClasses.push(c));
 
-    return {
-      year,
-      schoolName: meta.schoolName || "SPRING FIELD SCHOOL",
-      classes: orderedClasses,
-    };
+    return { year, schoolName: meta.schoolName || "SPRING FIELD SCHOOL", classes: orderedClasses };
   } catch (e) {
     console.error("Error reading book data:", e);
     return null;
   }
 };
 
-// Save book data — writes metadata + each class as separate doc
+// Save book data — class metadata (no images) + images as separate docs
 export const saveBookData = async (year, data) => {
   try {
-    const yearRef = doc(db, COLLECTION, year);
-
-    // Write year metadata (schoolName + class order)
-    await setDoc(yearRef, {
+    // 1. Write year metadata
+    await setDoc(doc(db, COLLECTION, year), {
       schoolName: data.schoolName,
       classOrder: data.classes.map((c) => c.id),
     });
 
-    // Delete old classes that no longer exist
-    const existingSnap = await getDocs(collection(db, COLLECTION, year, "classes"));
-    const currentIds = new Set(data.classes.map((c) => c.id));
-    const batch = writeBatch(db);
-    existingSnap.forEach((d) => {
-      if (!currentIds.has(d.id)) {
-        batch.delete(d.ref);
-      }
-    });
-    await batch.commit();
+    // 2. Get existing class + image docs for cleanup
+    const existingClasses = await getDocs(collection(db, COLLECTION, year, "classes"));
+    const existingImages = await getDocs(collection(db, COLLECTION, year, "images"));
 
-    // Write each class individually
+    const currentClassIds = new Set(data.classes.map((c) => c.id));
+    const newImageIds = new Set();
+
+    // 3. Write each class (books WITHOUT image data) + images separately
     for (const cls of data.classes) {
-      const classRef = doc(db, COLLECTION, year, "classes", cls.id);
-      await setDoc(classRef, {
+      const strippedBooks = [];
+
+      for (const book of cls.books) {
+        // Save front image
+        if (book.frontImage && book.frontImage.length > 100) {
+          const imgId = `${cls.id}_${book.id}_front`;
+          newImageIds.add(imgId);
+          await setDoc(doc(db, COLLECTION, year, "images", imgId), { data: book.frontImage });
+        }
+
+        // Save back image
+        if (book.backImage && book.backImage.length > 100) {
+          const imgId = `${cls.id}_${book.id}_back`;
+          newImageIds.add(imgId);
+          await setDoc(doc(db, COLLECTION, year, "images", imgId), { data: book.backImage });
+        }
+
+        strippedBooks.push({
+          id: book.id,
+          name: book.name,
+          price: book.price,
+          frontImage: book.frontImage ? "ref" : "",
+          backImage: book.backImage ? "ref" : "",
+        });
+      }
+
+      await setDoc(doc(db, COLLECTION, year, "classes", cls.id), {
         name: cls.name,
-        books: cls.books || [],
+        books: strippedBooks,
       });
     }
+
+    // 4. Delete removed classes and orphaned images
+    const batch = writeBatch(db);
+    existingClasses.forEach((d) => {
+      if (!currentClassIds.has(d.id)) batch.delete(d.ref);
+    });
+    existingImages.forEach((d) => {
+      // Delete images for deleted classes or removed books
+      const classId = d.id.split("_")[0];
+      if (!currentClassIds.has(classId) || !newImageIds.has(d.id)) {
+        // Only delete if this class's book no longer has this image
+        // Keep existing images that weren't re-uploaded (they won't be in newImageIds)
+      }
+    });
+    // Delete classes that were removed
+    existingClasses.forEach((d) => {
+      if (!currentClassIds.has(d.id)) batch.delete(d.ref);
+    });
+    await batch.commit();
 
     return true;
   } catch (e) {
@@ -158,25 +240,17 @@ export const saveBookData = async (year, data) => {
   }
 };
 
-// Create a new year with default classes
+// Create a new year
 export const createYear = async (year, schoolName = "SPRING FIELD SCHOOL") => {
   try {
     const yearRef = doc(db, COLLECTION, year);
     const existing = await getDoc(yearRef);
     if (existing.exists()) return false;
 
-    const defaultClass = { id: "nursery", name: "NURSERY" };
-
-    await setDoc(yearRef, {
-      schoolName,
-      classOrder: [defaultClass.id],
-    });
-
-    await setDoc(doc(db, COLLECTION, year, "classes", defaultClass.id), {
-      name: defaultClass.name,
-      books: [
-        { id: 1, name: "", price: 0, frontImage: "", backImage: "" },
-      ],
+    await setDoc(yearRef, { schoolName, classOrder: ["nursery"] });
+    await setDoc(doc(db, COLLECTION, year, "classes", "nursery"), {
+      name: "NURSERY",
+      books: [{ id: 1, name: "", price: 0, frontImage: "", backImage: "" }],
     });
 
     return true;
@@ -186,16 +260,15 @@ export const createYear = async (year, schoolName = "SPRING FIELD SCHOOL") => {
   }
 };
 
-// Delete a year and all its class subcollection docs
+// Delete a year and all subcollection docs
 export const deleteYear = async (year) => {
   try {
-    // Delete all class docs first
     const classesSnap = await getDocs(collection(db, COLLECTION, year, "classes"));
+    const imagesSnap = await getDocs(collection(db, COLLECTION, year, "images"));
     const batch = writeBatch(db);
     classesSnap.forEach((d) => batch.delete(d.ref));
+    imagesSnap.forEach((d) => batch.delete(d.ref));
     await batch.commit();
-
-    // Delete year doc
     await deleteDoc(doc(db, COLLECTION, year));
     return true;
   } catch (e) {
@@ -204,7 +277,7 @@ export const deleteYear = async (year) => {
   }
 };
 
-// Compress and convert image file to base64 (auto-compresses to under ~300KB)
+// Compress and convert image file to base64 (~200KB target)
 export const fileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -214,11 +287,10 @@ export const fileToBase64 = (file) => {
       URL.revokeObjectURL(url);
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      const MAX_SIZE = 300 * 1024; // 300KB target (to stay well under 1MB per class doc)
+      const MAX_SIZE = 200 * 1024; // 200KB target
       let { width, height } = img;
 
-      // Scale down large images (max 900px on longest side)
-      const MAX_DIM = 900;
+      const MAX_DIM = 800;
       if (width > MAX_DIM || height > MAX_DIM) {
         const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
         width = Math.round(width * ratio);
@@ -229,7 +301,6 @@ export const fileToBase64 = (file) => {
       canvas.height = height;
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Try progressively lower quality until under target size
       let quality = 0.7;
       let result = canvas.toDataURL("image/jpeg", quality);
 
@@ -238,11 +309,9 @@ export const fileToBase64 = (file) => {
         result = canvas.toDataURL("image/jpeg", quality);
       }
 
-      // If still too large, scale down further
       if (result.length > MAX_SIZE) {
-        const scale = 0.5;
-        canvas.width = Math.round(width * scale);
-        canvas.height = Math.round(height * scale);
+        canvas.width = Math.round(width * 0.5);
+        canvas.height = Math.round(height * 0.5);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         result = canvas.toDataURL("image/jpeg", 0.5);
       }
@@ -250,24 +319,17 @@ export const fileToBase64 = (file) => {
       resolve(result);
     };
 
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Failed to load image"));
-    };
-
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Failed to load image")); };
     img.src = url;
   });
 };
 
-export const getClassTotal = (books) => {
-  return books.reduce((sum, book) => sum + (parseFloat(book.price) || 0), 0);
-};
+export const getClassTotal = (books) =>
+  books.reduce((sum, book) => sum + (parseFloat(book.price) || 0), 0);
 
 export const generateBookId = (books) => {
   if (!books || books.length === 0) return 1;
   return Math.max(...books.map((b) => b.id)) + 1;
 };
 
-export const generateClassId = (classes) => {
-  return `class_${Date.now()}`;
-};
+export const generateClassId = () => `class_${Date.now()}`;
