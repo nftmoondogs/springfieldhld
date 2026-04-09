@@ -1,76 +1,117 @@
 import { db } from "../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs, deleteDoc } from "firebase/firestore";
 
-const DOC_ID = "main";
 const COLLECTION = "bookData";
 
-const getDefaultBookData = () => ({
-  schoolName: "SPRING FIELD SCHOOL",
-  year: "2023-2024",
-  classes: [
-    {
-      id: "nursery",
-      name: "NURSERY",
-      books: [
-        { id: 1, name: "NUMBERS 1-20", price: 185, frontImage: "", backImage: "" },
-        { id: 2, name: "HINDI WORKBOOK 1 AKSHAR", price: 130, frontImage: "", backImage: "" },
-        { id: 3, name: "MATHS WRITE 1-20", price: 185, frontImage: "", backImage: "" },
-        { id: 4, name: "ENGLISH ALPHABETS", price: 275, frontImage: "", backImage: "" },
-        { id: 5, name: "DRAWING A", price: 195, frontImage: "", backImage: "" },
-      ],
-    },
-    {
-      id: "lkg",
-      name: "LKG",
-      books: [
-        { id: 1, name: "BAGH O BAHAR A", price: 155, frontImage: "", backImage: "" },
-        { id: 2, name: "RHYMES BALGEET B", price: 130, frontImage: "", backImage: "" },
-        { id: 3, name: "PICTURE BOOK A", price: 190, frontImage: "", backImage: "" },
-        { id: 4, name: "ACTIVITY BOOK CAPITAL WRITING", price: 250, frontImage: "", backImage: "" },
-        { id: 5, name: "MERI AKSHAR RACHNA ABHYAS", price: 250, frontImage: "", backImage: "" },
-      ],
-    },
-    {
-      id: "ukg",
-      name: "UKG",
-      books: [
-        { id: 1, name: "SAMPLE BOOK 1", price: 200, frontImage: "", backImage: "" },
-        { id: 2, name: "SAMPLE BOOK 2", price: 150, frontImage: "", backImage: "" },
-      ],
-    },
-  ],
-});
-
-// Fetch book data from Firestore
-export const getBookData = async () => {
+// Migrate old 'main' doc to year-based format (runs once)
+export const migrateOldData = async () => {
   try {
-    const docRef = doc(db, COLLECTION, DOC_ID);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return docSnap.data();
+    const mainRef = doc(db, COLLECTION, "main");
+    const mainSnap = await getDoc(mainRef);
+    if (mainSnap.exists()) {
+      const data = mainSnap.data();
+      const year = data.year || "2026-2027";
+      const { year: _, ...dataWithoutYear } = data;
+      // Copy to year-based doc
+      const yearRef = doc(db, COLLECTION, year);
+      await setDoc(yearRef, dataWithoutYear);
+      // Delete old main doc
+      await deleteDoc(mainRef);
+      console.log(`Migrated old data to year: ${year}`);
     }
   } catch (e) {
-    console.error("Error reading book data from Firestore:", e);
+    console.error("Migration error:", e);
   }
-  // Return default and save it
-  const defaultData = getDefaultBookData();
-  await saveBookData(defaultData);
-  return defaultData;
 };
 
-// Save book data to Firestore (images stored as base64 strings)
-export const saveBookData = async (data) => {
+const getDefaultClasses = () => [
+  {
+    id: "nursery",
+    name: "NURSERY",
+    books: [
+      { id: 1, name: "NUMBERS 1-20", price: 185, frontImage: "", backImage: "" },
+      { id: 2, name: "HINDI WORKBOOK 1 AKSHAR", price: 130, frontImage: "", backImage: "" },
+      { id: 3, name: "MATHS WRITE 1-20", price: 185, frontImage: "", backImage: "" },
+      { id: 4, name: "ENGLISH ALPHABETS", price: 275, frontImage: "", backImage: "" },
+      { id: 5, name: "DRAWING A", price: 195, frontImage: "", backImage: "" },
+    ],
+  },
+];
+
+// Get all available years from Firestore
+export const getAvailableYears = async () => {
   try {
-    const docRef = doc(db, COLLECTION, DOC_ID);
-    await setDoc(docRef, data);
+    const snapshot = await getDocs(collection(db, COLLECTION));
+    const years = [];
+    snapshot.forEach((doc) => {
+      years.push(doc.id);
+    });
+    // Sort descending (newest first)
+    years.sort((a, b) => b.localeCompare(a));
+    return years;
+  } catch (e) {
+    console.error("Error fetching years:", e);
+    return [];
+  }
+};
+
+// Fetch book data for a specific year
+export const getBookData = async (year) => {
+  if (!year) return null;
+  try {
+    const docRef = doc(db, COLLECTION, year);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { year, ...docSnap.data() };
+    }
+  } catch (e) {
+    console.error("Error reading book data:", e);
+  }
+  return null;
+};
+
+// Save book data for a specific year
+export const saveBookData = async (year, data) => {
+  try {
+    const docRef = doc(db, COLLECTION, year);
+    const { year: _, ...dataWithoutYear } = data;
+    await setDoc(docRef, dataWithoutYear);
     return true;
   } catch (e) {
-    console.error("Error saving book data to Firestore:", e);
+    console.error("Error saving book data:", e);
     return false;
   }
 };
 
-// Convert file to base64 string (for image storage in Firestore)
+// Create a new year with default or empty data
+export const createYear = async (year, schoolName = "SPRING FIELD SCHOOL") => {
+  try {
+    const docRef = doc(db, COLLECTION, year);
+    const existing = await getDoc(docRef);
+    if (existing.exists()) return false; // Already exists
+    await setDoc(docRef, {
+      schoolName,
+      classes: getDefaultClasses(),
+    });
+    return true;
+  } catch (e) {
+    console.error("Error creating year:", e);
+    return false;
+  }
+};
+
+// Delete a year
+export const deleteYear = async (year) => {
+  try {
+    await deleteDoc(doc(db, COLLECTION, year));
+    return true;
+  } catch (e) {
+    console.error("Error deleting year:", e);
+    return false;
+  }
+};
+
+// Convert file to base64 string
 export const fileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
