@@ -7,7 +7,11 @@ const BookList = () => {
   const [bookData, setBookData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
-  const [expandedClass, setExpandedClass] = useState(null);
+  const [collapsedClasses, setCollapsedClasses] = useState({});
+
+  const toggleClass = (id) => {
+    setCollapsedClasses((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   useEffect(() => {
     const fetchYears = async () => {
@@ -29,7 +33,7 @@ const BookList = () => {
       setLoading(true);
       const data = await getBookData(selectedYear);
       setBookData(data);
-      setExpandedClass(null);
+      setCollapsedClasses({});
       setLoading(false);
     };
     fetchData();
@@ -115,7 +119,7 @@ const BookList = () => {
           <div className="row g-4">
             {bookData.classes.map((cls, classIdx) => {
               const total = getClassTotal(cls.books);
-              const isExpanded = expandedClass === cls.id;
+              const isExpanded = !collapsedClasses[cls.id];
 
               return (
                 <div className="col-lg-6" key={cls.id}>
@@ -143,7 +147,7 @@ const BookList = () => {
                         justifyContent: "space-between",
                         cursor: "pointer",
                       }}
-                      onClick={() => setExpandedClass(isExpanded ? null : cls.id)}
+                      onClick={() => toggleClass(cls.id)}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                         <div
@@ -399,7 +403,7 @@ const BookList = () => {
                           borderTop: "1px solid #e2e8f0",
                           transition: "background 0.2s",
                         }}
-                        onClick={() => setExpandedClass(cls.id)}
+                        onClick={() => toggleClass(cls.id)}
                         onMouseEnter={(e) => { e.currentTarget.style.background = "#f1f5f9"; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = "#f8fafc"; }}
                       >

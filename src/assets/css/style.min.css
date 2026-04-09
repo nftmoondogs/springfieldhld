@@ -28,3 +28,28 @@ Tags: academy, children, education, institute, kids, kids care, kids care home, 
     width: auto !important;
   }
 }
+
+/* Fix header top bar text colors */
+.header-top {
+  background: #0f172a !important;
+  border-bottom: 1px solid #1e293b !important;
+}
+.header-top-area .left li {
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
+}
+.header-top-area .left li i {
+  color: #f59e0b !important;
+}
+/* Fix nav link colors */
+.header-bottom .menu > ul > li > a {
+  color: #1e293b !important;
+}
+.header-bottom .menu > ul > li > a:hover,
+.header-bottom .menu > ul > li > a.active {
+  color: #f59e0b !important;
+}
+/* Fix header bar (hamburger) color */
+.header-bar span {
+  background-color: #1e293b !important;
+}

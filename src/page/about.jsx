@@ -12,7 +12,7 @@ const AboutPage = () => {
 
   return (
     <Fragment>
-      <Header />
+      <Header hidelogo />
       {/* Custom page header */}
       <section
         style={{
