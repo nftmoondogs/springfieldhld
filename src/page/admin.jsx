@@ -33,6 +33,24 @@ const AdminPage = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const fileInputRefs = useRef({});
+  const [dragIndex, setDragIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  const handleDragStart = (index) => setDragIndex(index);
+  const handleDragOver = (e, index) => { e.preventDefault(); setDragOverIndex(index); };
+  const handleDragLeave = () => setDragOverIndex(null);
+  const handleDragEnd = () => { setDragIndex(null); setDragOverIndex(null); };
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === dropIndex) { handleDragEnd(); return; }
+    setBookData((p) => {
+      const c = [...p.classes];
+      const [moved] = c.splice(dragIndex, 1);
+      c.splice(dropIndex, 0, moved);
+      return { ...p, classes: c };
+    });
+    handleDragEnd();
+  };
 
   useEffect(() => {
     if (!authenticated) return;
@@ -316,13 +334,25 @@ const AdminPage = () => {
 
               {/* Classes */}
               {bookData.classes.map((cls, ci) => (
-                <div key={cls.id} className="tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-border-slate-200/60 tw-overflow-hidden tw-mb-5">
+                <div
+                  key={cls.id}
+                  draggable
+                  onDragStart={() => handleDragStart(ci)}
+                  onDragOver={(e) => handleDragOver(e, ci)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, ci)}
+                  onDragEnd={handleDragEnd}
+                  className={`tw-bg-white tw-rounded-xl sm:tw-rounded-2xl tw-shadow-sm tw-border tw-overflow-hidden tw-mb-5 tw-transition-all tw-duration-200 ${dragIndex === ci ? 'tw-opacity-50 tw-scale-[0.98] tw-border-amber-400' : dragOverIndex === ci ? 'tw-border-amber-500 tw-shadow-lg tw-shadow-amber-500/20 tw-border-2' : 'tw-border-slate-200/60'}`}
+                >
                   {/* Class Header */}
                   <div className="tw-bg-gradient-to-r tw-from-slate-800 tw-to-slate-900 tw-px-4 sm:tw-px-6 tw-py-3 sm:tw-py-4 tw-flex tw-items-center tw-justify-between tw-gap-2">
-                    <input type="text" value={cls.name} onChange={(e) => updateClassName(ci, e.target.value)}
-                      placeholder="Class Name"
-                      className="tw-bg-white/10 tw-border tw-border-white/20 tw-text-white tw-px-3 tw-py-1.5 tw-rounded-lg tw-text-base sm:tw-text-lg tw-font-bold tw-uppercase tw-tracking-wider tw-outline-none focus:tw-border-amber-400 tw-w-full tw-max-w-[200px] placeholder:tw-text-white/40"
-                    />
+                    <div className="tw-flex tw-items-center tw-gap-2">
+                      <span className="tw-cursor-grab active:tw-cursor-grabbing tw-text-white/50 hover:tw-text-white tw-text-lg tw-select-none tw-shrink-0" title="Drag to reorder">⠿</span>
+                      <input type="text" value={cls.name} onChange={(e) => updateClassName(ci, e.target.value)}
+                        placeholder="Class Name"
+                        className="tw-bg-white/10 tw-border tw-border-white/20 tw-text-white tw-px-3 tw-py-1.5 tw-rounded-lg tw-text-base sm:tw-text-lg tw-font-bold tw-uppercase tw-tracking-wider tw-outline-none focus:tw-border-amber-400 tw-w-full tw-max-w-[200px] placeholder:tw-text-white/40"
+                      />
+                    </div>
                     <button onClick={() => removeClass(ci)} className="tw-px-3 tw-py-1.5 tw-bg-red-500/80 tw-text-white tw-rounded-lg tw-font-bold tw-text-xs hover:tw-bg-red-500 tw-transition-colors tw-whitespace-nowrap tw-shrink-0">
                       Delete
                     </button>
